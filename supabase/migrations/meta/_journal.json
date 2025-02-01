@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1737551072864,
+      "tag": "0000_zippy_silver_samurai",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1737555038571,
+      "tag": "0001_clever_magma",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737574198518,
+      "tag": "0002_medical_anthem",
+      "breakpoints": true
+    }
+  ]
+}
