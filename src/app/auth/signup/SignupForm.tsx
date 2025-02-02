@@ -3,28 +3,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-
-const signupSchema = z.object({
-    email: z.string().email('Invalid email address'),
-    password: z
-        .string()
-        .min(8, 'Password must be at least 8 characters')
-        .max(100, 'Password must not exceed 100 characters'),
-})
-
-type signupSchema = z.infer<typeof signupSchema>
+import { signupSchema, TSignupSchema } from '@/lib/schemas/signupSchema'
 
 export default function SignupForm() {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<signupSchema>({
+    } = useForm<TSignupSchema>({
         resolver: zodResolver(signupSchema),
     })
-    const onSubmit: SubmitHandler<signupSchema> = (data) => console.log(data)
+    const onSubmit: SubmitHandler<TSignupSchema> = (data) => console.log(data)
 
     return (
         <form

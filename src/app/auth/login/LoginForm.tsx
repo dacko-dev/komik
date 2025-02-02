@@ -1,38 +1,22 @@
 'use client'
-import Image from 'next/image'
+
 import Link from 'next/link'
 import React from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import GoogleButton from '@/components/buttons/GoogleButton/GoogleButton'
 import FacebookButton from '@/components/buttons/FacebookButton/FacebookButton'
-const loginSchema = z.object({
-    email: z.string().email('Invalid email address'),
-    password: z
-        .string()
-        .min(8, 'Password must be at least 8 characters')
-        .max(100, 'Password must not exceed 100 characters')
-        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-        .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-        .regex(/[0-9]/, 'Password must contain at least one number')
-        .regex(
-            /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/,
-            'Password must contain at least one special character (!@#$%^&*()_+-=[]{};\':"\\|,.<>/?)'
-        ),
-})
-
-type LoginSchema = z.infer<typeof loginSchema>
+import { loginSchema, TLoginSchema } from '@/lib/schemas/loginSchema'
 
 export default function LoginForm() {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<LoginSchema>({
+    } = useForm<TLoginSchema>({
         resolver: zodResolver(loginSchema),
     })
-    const onSubmit: SubmitHandler<LoginSchema> = (data) => console.log(data)
+    const onSubmit: SubmitHandler<TLoginSchema> = (data) => console.log(data)
 
     return (
         <form
