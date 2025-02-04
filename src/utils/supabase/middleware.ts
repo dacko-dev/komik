@@ -43,7 +43,7 @@ export async function updateSession(request: NextRequest) {
 
     if (
         !user &&
-        !PROTECTED_ROUTES.some((route) =>
+        PROTECTED_ROUTES.some((route) =>
             request.nextUrl.pathname.startsWith(route)
         )
         // !request.nextUrl.pathname.startsWith('/dashboard') &&
