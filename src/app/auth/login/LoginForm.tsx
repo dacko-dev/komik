@@ -7,16 +7,26 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import GoogleButton from '@/components/buttons/GoogleButton/GoogleButton'
 import FacebookButton from '@/components/buttons/FacebookButton/FacebookButton'
 import { loginSchema, TLoginSchema } from '@/lib/schemas/loginSchema'
+import { loginAction } from '@/actions/loginAction'
+import toast from 'react-hot-toast'
 
 export default function LoginForm() {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitting },
     } = useForm<TLoginSchema>({
         resolver: zodResolver(loginSchema),
     })
-    const onSubmit: SubmitHandler<TLoginSchema> = (data) => console.log(data)
+    const onSubmit: SubmitHandler<TLoginSchema> = async (
+        data: TLoginSchema
+    ) => {
+        const result = await loginAction(data)
+        if (result.isError) {
+            console.error('Error signing up:', result.message)
+            toast.error(result.message)
+        }
+    }
 
     return (
         <form
@@ -24,7 +34,7 @@ export default function LoginForm() {
             className="flex items-center justify-center flex-col px-20 py-10"
         >
             <h1 className="text-3xl  font-bold text-center mb-8">Welcome!</h1>
-            <fieldset className="fieldset items-stretch justify-center flex flex-col gap-2 w-full">
+            <fieldset className="fieldset items-stretch justify-center flex flex-col gap-2 w-full max-w-[300px]">
                 <div>
                     <label className="fieldset-label mb-1">Email</label>
                     <input
@@ -57,7 +67,12 @@ export default function LoginForm() {
                     )}
                 </div>
 
-                <button type="submit" className="btn btn-primary w-full  mt-2">
+                <button
+                    type="submit"
+                    className={`btn btn-primary w-full mt-2 ${
+                        isSubmitting ? 'loading loading-spinner' : ''
+                    }`}
+                >
                     Login
                 </button>
                 <p className="text-sm text-center">or</p>

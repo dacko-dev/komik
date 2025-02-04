@@ -4,15 +4,13 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
-import { signupSchema } from '@/lib/schemas/signupSchema'
+import { signupSchema, TSignupSchema } from '@/lib/schemas/signupSchema'
 import { TActionResponse } from '@/types'
 
-export async function signupAction(formData: FormData) {
+export async function signupAction(data: TSignupSchema) {
     const supabase = await createClient()
 
-    const parsed = signupSchema.safeParse(
-        Object.fromEntries(formData.entries())
-    )
+    const parsed = signupSchema.safeParse(data)
 
     if (!parsed.success) {
         return {

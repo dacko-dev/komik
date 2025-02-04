@@ -6,13 +6,12 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { signupSchema } from '@/lib/schemas/signupSchema'
 import { TActionResponse } from '@/types'
+import { TLoginSchema } from '@/lib/schemas/loginSchema'
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(data: TLoginSchema) {
     const supabase = await createClient()
 
-    const parsed = signupSchema.safeParse(
-        Object.fromEntries(formData.entries())
-    )
+    const parsed = signupSchema.safeParse(data)
     if (!parsed.success) {
         return {
             isError: true,
