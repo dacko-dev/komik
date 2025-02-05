@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Search() {
     return (
-        <label className="input">
+        <label className="input w-2xs">
             <svg
                 className="h-[1em] opacity-50"
                 xmlns="http://www.w3.org/2000/svg"
