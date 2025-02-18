@@ -83,3 +83,9 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ---- COMPONENTS ---- */
+
+.dice-face {
+    @apply absolute flex items-center justify-center backface-hidden;
+}
