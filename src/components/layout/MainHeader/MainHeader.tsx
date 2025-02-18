@@ -1,8 +1,9 @@
 import AvatarDropdown from '@/components/layout/MainHeader/AvatarDropdown'
-import BookmarkButton from '@/components/layout/MainHeader/BookmarkButton'
 import MainSubheader from '@/components/layout/MainHeader/MainSubheader'
 import Search from '@/components/layout/MainHeader/Search'
+import ThemeButton from '@/components/layout/MainHeader/ThemeButton'
 import Logo from '@/components/Logo/Logo'
+import Dice from '@/components/miscellaneous/Dice/Dice'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import React from 'react'
@@ -16,11 +17,14 @@ export async function MainHeader() {
             <div className="col-span-full grid grid-cols-(--main-grid-cols) shadow-sm bg-base-300">
                 <header className="col-start-2 flex items-center justify-between col-end-3 navbar bg-base-300 shadow-sm sticky px-4 ">
                     <Logo />
-                    <Search />
+                    <div className="flex items-center gap-4">
+                        <Dice size={30} />
+                        <Search />
+                    </div>
                     {user ? (
                         <div className="flex items-center gap-2">
-                            <div>
-                                <BookmarkButton />
+                            <div className="flex items-center gap-2">
+                                <ThemeButton />
                             </div>
                             <AvatarDropdown user={user} />
                         </div>
