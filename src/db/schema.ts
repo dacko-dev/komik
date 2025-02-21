@@ -258,6 +258,7 @@ export const comics = pgTable(
         title: text().notNull(),
         description: text(),
         seriesId: text('series_id'),
+        collectionId: uuid('collection_id'),
         language: text().default("'en'"),
         visibility: text(),
         // You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -278,6 +279,21 @@ export const comics = pgTable(
         })
             .onUpdate('cascade')
             .onDelete('cascade'),
+        foreignKey({
+            columns: [table.seriesId],
+            foreignColumns: [series.id],
+            name: 'comics_series_id_fkey',
+        })
+            .onUpdate('cascade')
+            .onDelete('set null'),
+        foreignKey({
+            columns: [table.collectionId],
+            foreignColumns: [collections.id],
+            name: 'comics_collection_id_fkey',
+        })
+            .onUpdate('cascade')
+            .onDelete('set null'),
+
         pgPolicy('Enable insert for authenticated users only', {
             as: 'permissive',
             for: 'insert',
@@ -769,6 +785,28 @@ export const comicsGenres = pgTable(
             name: 'comics_genres_pkey',
         }),
         pgPolicy('Enable read access for all users', {
+            as: 'permissive',
+            for: 'select',
+            to: ['public'],
+            using: sql`true`,
+        }),
+    ]
+)
+
+export const comicLengths = pgTable(
+    'comic_lengths',
+    {
+        id: uuid().defaultRandom().primaryKey().notNull(),
+        length: integer().notNull(),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'string',
+        })
+            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .notNull(),
+    },
+    () => [
+        pgPolicy('Enable select for all users', {
             as: 'permissive',
             for: 'select',
             to: ['public'],

@@ -1,5 +1,6 @@
 'use client'
 
+import ComicSplitter from '@/components/inputs/ComicSplitter/ComicSplitter'
 import { FormInputWithLabel } from '@/components/inputs/FormInputWithLabel/FormInputWithLabel'
 import { FormSelectWithLabel } from '@/components/inputs/FormSelectWithLabel/FormSelectWithLabel'
 import { FormTextareaWithLabel } from '@/components/inputs/FormTextareaWithLabel/FormTextareaWithLabel'
@@ -66,6 +67,7 @@ export default function AddComicForm() {
                         { value: 'horror', label: 'Horror' },
                     ]}
                 />
+                <ComicSplitter />
 
                 <FormSelectWithLabel<TAddComicForm>
                     fieldLabel="Panel Count"
