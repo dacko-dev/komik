@@ -1,3 +1,5 @@
+// ReactScan must be the top-most import in this file!
+import { ReactScan } from '@/components/miscellaneous/ReactScan/ReactScan'
 import type { Metadata } from 'next'
 import './globals.css'
 import { APP_DESCRIPTION, APP_NAME } from '@/lib/constants'
@@ -25,6 +27,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <ReactScan />
             <body
                 className={`${smoochSans.variable} ${smoochSans.variable} antialiased`}
             >
