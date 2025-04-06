@@ -1,4 +1,9 @@
-import { InputHTMLAttributes } from 'react'
+import { COMIC_SPLIT_TYPES } from '@/constants'
+import {
+    InputHTMLAttributes,
+    SelectHTMLAttributes,
+    TextareaHTMLAttributes,
+} from 'react'
 
 export type TActionResponse = {
     isError?: boolean
@@ -29,8 +34,10 @@ type TSelectOption = {
 export type TFormSelectField<S> = TFormField<S> & {
     selectClassName?: string
     options: TSelectOption[]
-} & InputHTMLAttributes<HTMLSelectElement>
+} & SelectHTMLAttributes<HTMLSelectElement>
 
 export type TFormTextAreaField<S> = TFormField<S> & {
     textareaClassName?: string
-} & InputHTMLAttributes<HTMLTextAreaElement>
+} & TextareaHTMLAttributes<HTMLTextAreaElement>
+
+export type TCOMIC_SPLIT_TYPES = (typeof COMIC_SPLIT_TYPES)[number]

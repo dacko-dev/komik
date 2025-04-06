@@ -5,11 +5,12 @@ import { FormInputWithLabel } from '@/components/inputs/FormInputWithLabel/FormI
 import { FormSelectWithLabel } from '@/components/inputs/FormSelectWithLabel/FormSelectWithLabel'
 import { FormTextareaWithLabel } from '@/components/inputs/FormTextareaWithLabel/FormTextareaWithLabel'
 import { fileSchema } from '@/lib/schemas/appLogicSchema'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { TCOMIC_SPLIT_TYPES } from '@/types'
+import { FileInputDNDWithLabel } from '@/components/inputs/FileInputDNDWithLabel/FileInputDNDWithLabel'
 
 const AddComicSchema = z.object({
     title: z.string(),
@@ -30,6 +31,9 @@ const AddComicSchema = z.object({
 type TAddComicForm = z.infer<typeof AddComicSchema>
 
 export default function AddComicForm() {
+    const [comicSplitType, setComicSplitType] =
+        React.useState<TCOMIC_SPLIT_TYPES>('Split')
+
     const methods = useForm<TAddComicForm>({
         defaultValues: {
             title: '',
@@ -51,11 +55,13 @@ export default function AddComicForm() {
         <FormProvider {...methods}>
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="flex  justify-center items-center flex-col"
+                className="flex justify-center items-stretch flex-col w-full max-w-lg"
             >
                 <FormInputWithLabel<TAddComicForm>
                     fieldLabel="Title"
                     nameInSchema="title"
+                    wrapperClassName="w-full"
+                    inputClassName="w-full"
                 />
 
                 <FormSelectWithLabel<TAddComicForm>
@@ -66,8 +72,9 @@ export default function AddComicForm() {
                         { value: 'sci-fi', label: 'Sci-Fi' },
                         { value: 'horror', label: 'Horror' },
                     ]}
+                    wrapperClassName="w-full"
+                    selectClassName="w-full"
                 />
-                <ComicSplitter />
 
                 <FormSelectWithLabel<TAddComicForm>
                     fieldLabel="Panel Count"
@@ -78,13 +85,65 @@ export default function AddComicForm() {
                         { value: '3', label: '3' },
                         { value: '4', label: '4' },
                     ]}
+                    wrapperClassName="w-full"
+                    selectClassName="w-full"
                 />
+                <FileInputDNDWithLabel
+                    nameInSchema={'panels'}
+                    fieldLabel="Panels"
+                    fieldDescription="Add your comic panels here. You can drag and drop files or click to select."
+                />
+
+                <div className="tabs tabs-box ">
+                    <input
+                        type="radio"
+                        name="Split"
+                        className="tab"
+                        aria-label="Split"
+                        checked={comicSplitType === 'Split'}
+                        onChange={() => setComicSplitType('Split')}
+                    />
+                    <input
+                        type="radio"
+                        name="Whole"
+                        className="tab"
+                        aria-label="Whole"
+                        checked={comicSplitType === 'Whole'}
+                        onChange={() => setComicSplitType('Whole')}
+                    />
+                </div>
+                {/* <ComicSplitter /> */}
 
                 <FormTextareaWithLabel<TAddComicForm>
                     fieldLabel="Description"
                     nameInSchema="description"
-                    type=""
+                    wrapperClassName="w-full"
+                    textareaClassName="w-full resize-auto"
                 />
+
+                <fieldset className="fieldset bg-base-200 border border-base-300 p-4 rounded-field w-full">
+                    <legend className="fieldset-legend">Options</legend>
+                    <div className="flex  gap-8">
+                        <label className="fieldset-label text-base select-none">
+                            <input
+                                type="checkbox"
+                                defaultChecked
+                                className="checkbox"
+                            />
+                            Private
+                        </label>
+
+                        <label className="fieldset-label text-base select-none">
+                            <input type="checkbox" className="checkbox" />
+                            Disable Comments
+                        </label>
+
+                        <label className="fieldset-label text-base select-none">
+                            <input type="checkbox" className="checkbox" />
+                            Draw Over
+                        </label>
+                    </div>
+                </fieldset>
             </form>
         </FormProvider>
     )
