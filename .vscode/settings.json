@@ -1,4 +1,10 @@
 {
+    "github.copilot.chat.codeGeneration.instructions": [
+        {
+            "file": "./.vscode/daisyui.md"
+        }
+    ],
+
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3456bf",
         "activityBar.background": "#3456bf",
