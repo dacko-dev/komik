@@ -30,6 +30,14 @@ export const reactionType = pgEnum('reaction_type', [
     'angry',
 ])
 
+export const comicPanelSplitType = pgEnum('comic_panel_split_type', [
+    'auto',
+    'grid',
+    'manual',
+])
+
+export const comicPanelSplitTypeSchema = createSelectSchema(comicPanelSplitType)
+
 export const reactions = pgTable(
     'reactions',
     {
