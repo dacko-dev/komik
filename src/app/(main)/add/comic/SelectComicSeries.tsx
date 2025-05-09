@@ -1,0 +1,194 @@
+import LabelNewBadgeButton from '@/components/buttons/LabelNewBadgeButton/LabelNewBadgeButton'
+import AddSeriesForm from '@/components/forms/AddSeriesForm/AddSeriesForm'
+import Modal from '@/components/ui/Modal/Modal'
+import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormFieldDescription'
+import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'
+import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
+import { seriesSelectSchema } from '@/db/schema'
+import { TFormField } from '@/types'
+import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
+import Image from 'next/image'
+import React, { useEffect, useRef, useState } from 'react'
+import { Controller, useFormContext } from 'react-hook-form'
+import { z } from 'zod'
+
+/*
+ * SelectComicSeries component
+ * This component is used to select a comic series from a list of series.
+ * It uses react-hook-form Controller to manage the form input state.
+ *
+ * @param {TFormField<S>} - The form field properties.
+ * @param {series} - The list of comic series to select from.
+ * @returns {JSX.Element} - The rendered component.
+ */
+export default function SelectComicSeries<S>({
+    series,
+    fieldLabel,
+    fieldDescription,
+    nameInSchema,
+    labelClassName,
+    wrapperClassName,
+}: TFormField<S> & {
+    series: z.infer<typeof seriesSelectSchema>[]
+}) {
+    const form = useFormContext()
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    const [canScrollLeft, setCanScrollLeft] = useState(false)
+    const [canScrollRight, setCanScrollRight] = useState(false)
+
+    const updateScrollButtons = () => {
+        const container = scrollRef.current
+        if (!container) return
+
+        setCanScrollLeft(container.scrollLeft > 0)
+        setCanScrollRight(
+            container.scrollLeft + container.clientWidth <
+                container.scrollWidth - 1
+        )
+    }
+
+    useEffect(() => {
+        const container = scrollRef.current
+        if (!container) return
+
+        updateScrollButtons()
+
+        container.addEventListener('scroll', updateScrollButtons)
+        window.addEventListener('resize', updateScrollButtons)
+
+        return () => {
+            container.removeEventListener('scroll', updateScrollButtons)
+            window.removeEventListener('resize', updateScrollButtons)
+        }
+    }, [series])
+
+    const scroll = (direction: 'left' | 'right') => {
+        if (!scrollRef.current) return
+        const scrollAmount = 200
+        scrollRef.current.scrollBy({
+            left: direction === 'left' ? -scrollAmount : scrollAmount,
+            behavior: 'smooth',
+        })
+    }
+
+    return (
+        <Controller
+            control={form.control}
+            name={nameInSchema}
+            render={({ field, fieldState }) => (
+                <fieldset className={`fieldset ${wrapperClassName}`}>
+                    <FormFieldLabel
+                        className={labelClassName}
+                        fieldLabel={
+                            <p className="flex items-center gap-2">
+                                {fieldLabel}
+                                <Modal
+                                    usePortal={true}
+                                    modalId="add-comic-series"
+                                    modalTitle="Add Series"
+                                    modalDescription="Create a new series to get started"
+                                    onConfirm={() =>
+                                        console.log('Create Series')
+                                    }
+                                    trigger={<LabelNewBadgeButton />}
+                                    submitLabel="Create"
+                                    cancelLabel="Cancel"
+                                >
+                                    <AddSeriesForm />
+                                </Modal>
+                            </p>
+                        }
+                    />
+
+                    {series.length > 0 ? (
+                        <div className="relative overflow-x-auto">
+                            {canScrollLeft && (
+                                <button
+                                    type="button"
+                                    className="absolute left-2 z-10 btn btn-circle top-2/5"
+                                    onClick={() => scroll('left')}
+                                >
+                                    <ChevronLeft />
+                                </button>
+                            )}
+                            {canScrollRight && (
+                                <button
+                                    type="button"
+                                    className="absolute right-2 z-10 btn btn-circle top-2/5"
+                                    onClick={() => scroll('right')}
+                                >
+                                    <ChevronRight />
+                                </button>
+                            )}
+
+                            <div
+                                ref={scrollRef}
+                                className="relative hide-scrollbar flex flex-nowrap overflow-x-auto items-center gap-4"
+                            >
+                                {series.map((s) => (
+                                    <div
+                                        key={s.id}
+                                        className={`flex flex-col shrink-0 h-48 w-36 rounded-sm overflow-hidden transition-all border-2
+                                            ${
+                                                field.value === s.id
+                                                    ? 'bg-secondary text-secondary-content border-secondary'
+                                                    : 'bg-base-200 border-base-200'
+                                            }
+                                        `}
+                                    >
+                                        <label
+                                            htmlFor={`${nameInSchema}-${s.id}`}
+                                            className="cursor-pointer h-full w-full flex flex-col items-center justify-center"
+                                        >
+                                            <div className="w-full grow flex items-center justify-center overflow-hidden rounded-sm">
+                                                {s.thumbnail ? (
+                                                    <Image
+                                                        src={s.thumbnail}
+                                                        alt={s.name}
+                                                        className="w-full grow h-full object-cover object-center"
+                                                        width={200}
+                                                        height={100}
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-auto flex items-center justify-center">
+                                                        <ImageIcon />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="text-sm text-center p-1">
+                                                {s.name}
+                                            </div>
+                                        </label>
+                                        <input
+                                            id={`${nameInSchema}-${s.id}`}
+                                            type="radio"
+                                            value={s.id}
+                                            checked={field.value === s.id}
+                                            onChange={() =>
+                                                field.onChange(s.id)
+                                            }
+                                            onClick={() => {
+                                                if (field.value === s.id) {
+                                                    field.onChange('')
+                                                }
+                                            }}
+                                            className="hidden"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="w-full flex flex-col items-center justify-center input h-auto border-2 border-dotted p-4">
+                            <span className="text-sm">No series found</span>
+                        </div>
+                    )}
+
+                    <FormFieldDescription fieldDescription={fieldDescription} />
+                    <FormFieldError fieldError={fieldState.error?.message} />
+                </fieldset>
+            )}
+        />
+    )
+}

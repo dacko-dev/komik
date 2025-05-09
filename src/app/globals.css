@@ -48,7 +48,7 @@
     --color-base-200: oklch(23.26% 0.014 253.1);
     --color-base-300: oklch(21.15% 0.012 254.09);
     --color-base-content: oklch(97.807% 0.029 256.847);
-    --color-primary: oklch(90% 0.182 98.111);
+    --color-primary: oklch(80% 0.169 237.323);
     --color-primary-content: oklch(27% 0.006 286.033);
     --color-secondary: oklch(65% 0.241 354.308);
     --color-secondary-content: oklch(94% 0.028 342.258);
@@ -80,12 +80,35 @@
     --main-grid-rows: auto 1fr;
 }
 
+/*  ---- BASE ---- */
+
 body {
     font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---- CUSTOMIZED DAISYUI COMPONENTS ---- */
+
+@utility fieldset-legend {
+    @apply pb-0;
 }
 
 /* ---- COMPONENTS ---- */
 
 .dice-face {
     @apply absolute flex items-center justify-center backface-hidden;
+}
+
+/* Shared styles for form */
+.form {
+    @apply flex justify-center items-stretch flex-col gap-4 w-full;
+}
+
+/* UTILITYS */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
 }

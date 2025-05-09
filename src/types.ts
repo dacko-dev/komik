@@ -1,4 +1,3 @@
-import { COMIC_SPLIT_TYPES } from '@/constants'
 import {
     InputHTMLAttributes,
     SelectHTMLAttributes,
@@ -14,7 +13,7 @@ export type TActionResponseWithPayload<T> = TActionResponse & {
     data?: T
 }
 
-type TFormField<S> = {
+export type TFormField<S> = {
     fieldLabel: string
     fieldDescription?: string
     labelClassName?: string
@@ -26,18 +25,42 @@ export type TFormInputField<S> = TFormField<S> & {
     inputClassName?: string
 } & InputHTMLAttributes<HTMLInputElement>
 
-type TSelectOption = {
+export type TInputOption = {
     value: string
     label: string
 }
 
 export type TFormSelectField<S> = TFormField<S> & {
     selectClassName?: string
-    options: TSelectOption[]
+    options: TInputOption[]
 } & SelectHTMLAttributes<HTMLSelectElement>
 
 export type TFormTextAreaField<S> = TFormField<S> & {
     textareaClassName?: string
 } & TextareaHTMLAttributes<HTMLTextAreaElement>
 
-export type TCOMIC_SPLIT_TYPES = (typeof COMIC_SPLIT_TYPES)[number]
+export type TAutocompleteInputFieldProps = {
+    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+    datalistProps: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLDataListElement>,
+        HTMLDataListElement
+    >
+    suggestions: string[]
+    loading: boolean
+    wrapperClassName?: string
+    onSuggestionClick?: (suggestion: string) => void
+}
+
+export type TFormAutocompleteInputField<S> = TFormField<S> &
+    Omit<TAutocompleteInputFieldProps, 'loading' | 'suggestions'> & {
+        suggestions: SuggestionSource
+    }
+
+export type TFormTagInputField<S> = TFormField<S>
+
+export type TFormComboBoxField<S> = TFormField<S> & {
+    options: TInputOption[]
+    multiple?: boolean
+} & InputHTMLAttributes<HTMLInputElement>
+
+export type SuggestionSource = string[] | ((query: string) => Promise<string[]>)

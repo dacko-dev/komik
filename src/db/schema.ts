@@ -15,11 +15,15 @@ import {
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { authenticatedRole, authUsers } from 'drizzle-orm/supabase'
+import { createSelectSchema } from 'drizzle-zod'
 
 export const contentVisibility = pgEnum('content_visibility', [
-    'private',
     'public',
+    'private',
+    'followers only',
 ])
+
+export const contentVisibilitySchema = createSelectSchema(contentVisibility)
 
 export const reactionType = pgEnum('reaction_type', [
     'like',
@@ -247,6 +251,8 @@ export const collections = pgTable(
     ]
 )
 
+export const collectionsSelectSchema = createSelectSchema(collections)
+
 export const comics = pgTable(
     'comics',
     {
@@ -268,7 +274,11 @@ export const comics = pgTable(
         seriesId: text('series_id'),
         collectionId: uuid('collection_id'),
         language: text().default("'en'"),
-        visibility: text(),
+        panelSplitType: comicPanelSplitType('panel_split_type'), // if null, panels are not split
+        panelCount: integer('panel_count').notNull(),
+        disableComments: boolean('disable_comments').default(false),
+        drawOver: boolean('draw_over').default(false),
+        visibility: contentVisibility('visibility').default('public'),
         // You can use { mode: "bigint" } if numbers are exceeding js number limitations
         totalViews: bigint('total_views', { mode: 'number' }).default(sql`'0'`),
         userId: uuid('user_id')
@@ -298,6 +308,13 @@ export const comics = pgTable(
             columns: [table.collectionId],
             foreignColumns: [collections.id],
             name: 'comics_collection_id_fkey',
+        })
+            .onUpdate('cascade')
+            .onDelete('set null'),
+        foreignKey({
+            columns: [table.panelCount],
+            foreignColumns: [comicPanelCount.id],
+            name: 'comics_panel_count_id_fkey',
         })
             .onUpdate('cascade')
             .onDelete('set null'),
@@ -517,6 +534,8 @@ export const series = pgTable(
         }),
     ]
 )
+
+export const seriesSelectSchema = createSelectSchema(series)
 
 export const comicCommentHistory = pgTable(
     'comic_comment_history',
@@ -801,8 +820,8 @@ export const comicsGenres = pgTable(
     ]
 )
 
-export const comicLengths = pgTable(
-    'comic_lengths',
+export const comicPanelCount = pgTable(
+    'comic_panel_count',
     {
         id: uuid().defaultRandom().primaryKey().notNull(),
         length: integer().notNull(),

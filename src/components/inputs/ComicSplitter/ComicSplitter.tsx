@@ -1,21 +1,11 @@
+import { FILE_ACCEPTED_TYPES } from '@/constants'
+import clsx from 'clsx'
 import React, { useState, useRef } from 'react'
+import { Rnd } from 'react-rnd' // Draggable and resizable
 
 type Mode = 'line' | 'box'
 type LineType = 'vertical' | 'horizontal'
 
-interface ComicSplitterProps {
-    imageSrc: string
-    mode: Mode // whether user is drawing lines or boxes
-    // For line mode, decide which type of line (vertical or horizontal)
-    lineType?: LineType
-    // For box mode, these constraints apply:
-    minWidth?: number
-    maxWidth?: number
-    minHeight?: number
-    maxHeight?: number
-}
-
-// Define shape types for drawn boundaries
 interface BoxShape {
     type: 'box'
     x: number
@@ -26,199 +16,259 @@ interface BoxShape {
 interface LineShape {
     type: 'line'
     lineType: LineType
-    position: number // x for vertical, y for horizontal
+    position: number
 }
 type Shape = BoxShape | LineShape
 
-const ComicSplitter: React.FC<ComicSplitterProps> = ({
-    imageSrc,
-    mode,
-    lineType = 'vertical',
-    minWidth = 50,
-    maxWidth = 1000,
-    minHeight = 50,
-    maxHeight = 1000,
-}) => {
-    const containerRef = useRef<HTMLDivElement>(null)
+const ComicSplitter = () => {
+    const [imageSrc, setImageSrc] = useState<string | null>(null)
+    const [mode, setMode] = useState<Mode>('box')
+    const [lineType, setLineType] = useState<LineType>('vertical')
     const [shapes, setShapes] = useState<Shape[]>([])
     const [isDrawing, setIsDrawing] = useState(false)
     const [startPoint, setStartPoint] = useState<{
         x: number
         y: number
     } | null>(null)
-    const [currentShape, setCurrentShape] = useState<Shape | null>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
 
-    // Convert mouse event to coordinates relative to container
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file) {
+            const reader = new FileReader()
+            reader.onload = (e) => setImageSrc(e.target?.result as string)
+            reader.readAsDataURL(file)
+        }
+    }
+
     const getRelativeCoords = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!containerRef.current) return { x: 0, y: 0 }
         const rect = containerRef.current.getBoundingClientRect()
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-        }
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!imageSrc) return
         const coords = getRelativeCoords(e)
         setIsDrawing(true)
         setStartPoint(coords)
+
         if (mode === 'line') {
-            // For line mode, create a new line shape immediately.
-            const newLine: LineShape = {
-                type: 'line',
-                lineType,
-                position: lineType === 'vertical' ? coords.x : coords.y,
-            }
-            setCurrentShape(newLine)
-        } else if (mode === 'box') {
-            // For box mode, initialize a box shape.
-            const newBox: BoxShape = {
-                type: 'box',
-                x: coords.x,
-                y: coords.y,
-                width: 0,
-                height: 0,
-            }
-            setCurrentShape(newBox)
+            setShapes((prev) => [
+                ...prev,
+                {
+                    type: 'line',
+                    lineType,
+                    position: lineType === 'vertical' ? coords.x : coords.y,
+                },
+            ])
         }
     }
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!isDrawing || !startPoint || !currentShape) return
+    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!isDrawing || mode !== 'box' || !startPoint) return
         const coords = getRelativeCoords(e)
-        if (mode === 'box' && currentShape.type === 'box') {
-            // Calculate new width and height based on startPoint.
-            const newWidth = coords.x - startPoint.x
-            const newHeight = coords.y - startPoint.y
-            setCurrentShape({
-                type: 'box',
-                x: startPoint.x,
-                y: startPoint.y,
-                width: newWidth,
-                height: newHeight,
-            })
+        const width = coords.x - startPoint.x
+        const height = coords.y - startPoint.y
+        if (Math.abs(width) > 10 && Math.abs(height) > 10) {
+            setShapes((prev) => [
+                ...prev,
+                {
+                    type: 'box',
+                    x: startPoint.x,
+                    y: startPoint.y,
+                    width,
+                    height,
+                },
+            ])
         }
-        // For line mode, we assume the line is set on click.
+        setIsDrawing(false)
+        setStartPoint(null)
     }
 
-    const handleMouseUp = () => {
-        if (!isDrawing || !currentShape) return
-        setIsDrawing(false)
-        // For box mode, validate dimensions
-        if (currentShape.type === 'box') {
-            const box = currentShape
-            if (
-                Math.abs(box.width) < minWidth ||
-                Math.abs(box.width) > maxWidth ||
-                Math.abs(box.height) < minHeight ||
-                Math.abs(box.height) > maxHeight
-            ) {
-                // Discard the box if it doesn't meet the size criteria.
-                setCurrentShape(null)
-                setStartPoint(null)
-                return
-            }
-            // Normalize box dimensions so width and height are positive.
-            const normalizedBox: BoxShape = {
-                type: 'box',
-                x: box.width < 0 ? box.x + box.width : box.x,
-                y: box.height < 0 ? box.y + box.height : box.y,
-                width: Math.abs(box.width),
-                height: Math.abs(box.height),
-            }
-            setShapes((prev) => [...prev, normalizedBox])
-        } else if (currentShape.type === 'line') {
-            // For line mode, add the line as-is.
-            setShapes((prev) => [...prev, currentShape])
+    const clearShapes = () => setShapes([])
+
+    const sliceImage = () => {
+        if (!imageSrc) return
+        const img = new Image()
+        img.src = imageSrc
+        img.onload = () => {
+            const slices = shapes.map((shape, index) => {
+                if (shape.type !== 'box') return null
+                const canvas = document.createElement('canvas')
+                canvas.width = shape.width
+                canvas.height = shape.height
+                const ctx = canvas.getContext('2d')
+                if (ctx)
+                    ctx.drawImage(
+                        img,
+                        shape.x,
+                        shape.y,
+                        shape.width,
+                        shape.height,
+                        0,
+                        0,
+                        shape.width,
+                        shape.height
+                    )
+                return { id: index, src: canvas.toDataURL('image/png') }
+            })
+            console.log('Sliced Images:', slices.filter(Boolean)) // Replace with actual UI
         }
-        setCurrentShape(null)
-        setStartPoint(null)
     }
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Comic Splitter Editor</h2>
-            <div
-                ref={containerRef}
-                className="relative border"
-                style={{ display: 'inline-block' }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-            >
-                <img src={imageSrc} alt="Comic" className="block max-w-full" />
-                {/* Render finalized shapes */}
-                {shapes.map((shape, idx) => {
-                    if (shape.type === 'box') {
-                        return (
-                            <div
-                                key={idx}
-                                style={{
-                                    position: 'absolute',
-                                    left: shape.x,
-                                    top: shape.y,
-                                    width: shape.width,
-                                    height: shape.height,
-                                    border: '2px dashed red',
-                                    pointerEvents: 'none',
-                                }}
-                            ></div>
-                        )
-                    } else if (shape.type === 'line') {
-                        if (shape.lineType === 'vertical') {
-                            return (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        position: 'absolute',
-                                        left: shape.position,
-                                        top: 0,
-                                        bottom: 0,
-                                        width: '2px',
-                                        backgroundColor: 'blue',
-                                        pointerEvents: 'none',
-                                    }}
-                                ></div>
-                            )
-                        } else {
-                            return (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        position: 'absolute',
-                                        top: shape.position,
-                                        left: 0,
-                                        right: 0,
-                                        height: '2px',
-                                        backgroundColor: 'blue',
-                                        pointerEvents: 'none',
-                                    }}
-                                ></div>
-                            )
-                        }
-                    }
-                    return null
-                })}
-                {/* Render current shape being drawn */}
-                {currentShape && currentShape.type === 'box' && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            left: (currentShape as BoxShape).x,
-                            top: (currentShape as BoxShape).y,
-                            width: (currentShape as BoxShape).width,
-                            height: (currentShape as BoxShape).height,
-                            border: '2px solid green',
-                            pointerEvents: 'none',
-                        }}
-                    ></div>
+            <input
+                className="file-input file-input-primary"
+                type="file"
+                accept={FILE_ACCEPTED_TYPES.map((type) => `.${type}`).join(',')}
+                onChange={handleImageUpload}
+            />
+            <div className="flex space-x-4 mt-2">
+                <button
+                    type="button"
+                    onClick={() => setMode('box')}
+                    // className={mode === 'box' ? 'font-bold' : ''}
+                    className={clsx('btn', {
+                        'font-bold': mode === 'box',
+                    })}
+                >
+                    Box Mode
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setMode('line')}
+                    className={clsx('btn', {
+                        'font-bold': mode === 'box',
+                    })}
+                >
+                    Line Mode
+                </button>
+                {mode === 'line' && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setLineType('vertical')}
+                            className={
+                                lineType === 'vertical' ? 'font-bold' : ''
+                            }
+                        >
+                            Vertical
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setLineType('horizontal')}
+                            // className={
+                            //     lineType === 'horizontal' ? 'font-bold' : ''
+                            // }
+                            className={clsx('btn', {
+                                'font-bold': lineType === 'horizontal',
+                            })}
+                        >
+                            Horizontal
+                        </button>
+                    </>
                 )}
             </div>
-            <div className="mt-4">
-                <h3 className="font-semibold">Drawn Shapes:</h3>
-                <pre className="text-sm text-gray-700">
-                    {JSON.stringify(shapes, null, 2)}
-                </pre>
+
+            {imageSrc && (
+                <div
+                    ref={containerRef}
+                    className="relative border mt-4 inline-block"
+                >
+                    <img
+                        src={imageSrc}
+                        alt="Comic"
+                        className="block max-w-full"
+                        onMouseDown={handleMouseDown}
+                        onMouseUp={handleMouseUp}
+                    />
+
+                    {shapes.map((shape, idx) =>
+                        shape.type === 'box' ? (
+                            <Rnd
+                                key={idx}
+                                default={{
+                                    x: shape.x,
+                                    y: shape.y,
+                                    width: shape.width,
+                                    height: shape.height,
+                                }}
+                                bounds="parent"
+                                enableResizing
+                                onResizeStop={(
+                                    e,
+                                    dir,
+                                    ref,
+                                    delta,
+                                    position
+                                ) => {
+                                    setShapes((prev) =>
+                                        prev.map((s, i) =>
+                                            i === idx
+                                                ? {
+                                                      ...s,
+                                                      ...position,
+                                                      width: ref.offsetWidth,
+                                                      height: ref.offsetHeight,
+                                                  }
+                                                : s
+                                        )
+                                    )
+                                }}
+                                onDragStop={(e, d) => {
+                                    setShapes((prev) =>
+                                        prev.map((s, i) =>
+                                            i === idx
+                                                ? { ...s, x: d.x, y: d.y }
+                                                : s
+                                        )
+                                    )
+                                }}
+                            >
+                                <div className="border-2 border-red-500 bg-opacity-30 bg-red-300 h-full w-full" />
+                            </Rnd>
+                        ) : (
+                            <div
+                                key={idx}
+                                className="absolute bg-blue-500"
+                                style={
+                                    shape.lineType === 'vertical'
+                                        ? {
+                                              left: shape.position,
+                                              top: 0,
+                                              bottom: 0,
+                                              width: '2px',
+                                          }
+                                        : {
+                                              top: shape.position,
+                                              left: 0,
+                                              right: 0,
+                                              height: '2px',
+                                          }
+                                }
+                            ></div>
+                        )
+                    )}
+                </div>
+            )}
+
+            <div className="mt-4 space-x-4">
+                <button
+                    type="button"
+                    onClick={clearShapes}
+                    className="p-2 border rounded"
+                >
+                    Clear
+                </button>
+                <button
+                    type="button"
+                    onClick={sliceImage}
+                    className="p-2 border rounded bg-green-500 text-white"
+                >
+                    Slice Image
+                </button>
             </div>
         </div>
     )

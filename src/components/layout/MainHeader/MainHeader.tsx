@@ -14,8 +14,8 @@ export async function MainHeader() {
 
     return (
         <div className="col-span-full grid grid-cols-(--main-grid-cols)">
-            <div className="col-span-full grid grid-cols-(--main-grid-cols) shadow-sm bg-base-300">
-                <header className="col-start-2 flex items-center justify-between col-end-3 navbar bg-base-300 shadow-sm sticky px-4 ">
+            <div className="col-span-full grid grid-cols-(--main-grid-cols) shadow-md bg-base-300">
+                <header className="col-start-2 flex items-center justify-between col-end-3 navbar bg-base-300 sticky px-4 ">
                     <Logo />
                     <div className="flex items-center gap-4">
                         <Dice size={30} />

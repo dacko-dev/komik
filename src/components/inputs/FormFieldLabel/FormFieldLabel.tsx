@@ -5,12 +5,12 @@ export default function FormFieldLabel({
     htmlFor,
     className,
 }: {
-    fieldLabel: string
-    htmlFor: string
+    fieldLabel: string | React.ReactNode
+    htmlFor?: string
     className?: string
 }) {
     return (
-        <label className={`fieldset-legend ${className}`} htmlFor={htmlFor}>
+        <label className={`fieldset-legend p-0 ${className}`} htmlFor={htmlFor}>
             {fieldLabel}
         </label>
     )
