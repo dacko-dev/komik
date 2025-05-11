@@ -17,6 +17,9 @@ import {
 import { sql } from 'drizzle-orm'
 import { authenticatedRole, authUsers } from 'drizzle-orm/supabase'
 import { createSelectSchema } from 'drizzle-zod'
+import { TComicOptions, TPanelInfo } from '@/types'
+import { z } from 'zod'
+import { MAX_PANEL_COLUMNS, MAX_PANEL_COUNT, MAX_PANEL_ROWS } from '@/constants'
 
 // ENUMS & VALUES
 export const contentVisibility = pgEnum('content_visibility', [
@@ -36,12 +39,7 @@ export const reactionType = pgEnum('reaction_type', [
     'angry',
 ])
 
-export const panelCountSchema = createSelectSchema(reactionType)
-
-export const MAX_PANEL_ROWS = 4 as const
-export const MAX_PANEL_COLUMNS = 4 as const
-export const MAX_PANEL_COUNT = MAX_PANEL_ROWS * MAX_PANEL_COLUMNS
-
+// TComicOptions Type in types.ts
 export const comicOptionsConfig = {
     drawOver: {
         name: 'drawOver',
@@ -59,16 +57,10 @@ export const comicOptionsConfig = {
     },
 } as const
 
-export const comicPanelSplitType = pgEnum('comic_panel_split_type', [
-    'auto',
-    'grid',
-    'manual',
-])
-
-export const comicPanelSplitTypeSchema = createSelectSchema(comicPanelSplitType)
+export const comicLayout = pgEnum('panel_layout', ['grid', 'custom'])
+export const comicLayoutSchema = createSelectSchema(comicLayout)
 
 // DB SCHEMA
-
 export const reactions = pgTable(
     'reactions',
     {
@@ -301,21 +293,18 @@ export const comics = pgTable(
         seriesId: text('series_id'),
         collectionId: uuid('collection_id'),
         language: text('language').notNull(),
-        panelSplitType: comicPanelSplitType('panel_split_type'), // if null, panels are not split
+        layout: comicLayout('panel_layout').default('grid'),
         panelCount: integer('panel_count').notNull(),
-        panelRows: integer('panel_rows').notNull(),
-        panelColumns: integer('panel_columns').notNull(),
+        rows: integer('rows').notNull(),
+        columns: integer('columns').notNull(),
         visibility: contentVisibility('visibility').default('public'),
         // disableComments: boolean('disable_comments').default(false),
         // drawOver: boolean('draw_over').default(false),
         options: jsonb('options')
-            .default({
-                [comicOptionsConfig.drawOver.name]:
-                    comicOptionsConfig.drawOver.default,
-                [comicOptionsConfig.disableComments.name]:
-                    comicOptionsConfig.disableComments.default,
-            })
-            .notNull(),
+            .$type<TComicOptions>()
+            .notNull()
+            .default(sql`'{}'`),
+
         totalViews: bigint('total_views', { mode: 'number' }).default(sql`'0'`),
         userId: uuid('user_id')
             .default(sql`auth.uid()`)
@@ -407,6 +396,24 @@ export const comics = pgTable(
     ]
 )
 
+export const panelInfoSchema = z.object({
+    x: z.number(),
+    y: z.number(),
+    width: z.number(),
+    height: z.number(),
+    rotation: z.number(),
+    zIndex: z.number(),
+})
+
+const panelInfoDefault = {
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    rotation: 0,
+    zIndex: 0,
+}
+
 export const panels = pgTable(
     'panels',
     {
@@ -414,6 +421,10 @@ export const panels = pgTable(
         comicId: uuid('comic_id'), // panel is not required to be in a comic
         image: text().notNull(),
         order: integer('order').notNull(),
+        info: jsonb('info')
+            .$type<TPanelInfo>()
+            .notNull()
+            .default(sql` ${JSON.stringify(panelInfoDefault)}`),
         createdAt: timestamp('created_at', {
             withTimezone: true,
             mode: 'string',
@@ -465,6 +476,8 @@ export const panels = pgTable(
     ]
 )
 
+export const panelSelectSchema = createSelectSchema(panels)
+
 export const comicComments = pgTable(
     'comic_comments',
     {
@@ -479,6 +492,8 @@ export const comicComments = pgTable(
             .default(sql`auth.uid()`)
             .notNull(),
         comicId: uuid('comic_id').notNull(),
+        rowNumber: integer('row_number').notNull(),
+        columnNumber: integer('column_number').notNull(),
         content: text().notNull(),
         updatedAt: timestamp('updated_at', {
             withTimezone: true,

@@ -4,3 +4,7 @@ export const FILE_ACCEPTED_TYPES = [
     'image/png',
     'image/gif',
 ] as const
+
+export const MAX_PANEL_ROWS = 4 as const
+export const MAX_PANEL_COLUMNS = 4 as const
+export const MAX_PANEL_COUNT = MAX_PANEL_ROWS * MAX_PANEL_COLUMNS
