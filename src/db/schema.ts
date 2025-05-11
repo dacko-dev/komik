@@ -12,11 +12,13 @@ import {
     boolean,
     primaryKey,
     pgEnum,
+    jsonb,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { authenticatedRole, authUsers } from 'drizzle-orm/supabase'
 import { createSelectSchema } from 'drizzle-zod'
 
+// ENUMS & VALUES
 export const contentVisibility = pgEnum('content_visibility', [
     'public',
     'private',
@@ -34,6 +36,29 @@ export const reactionType = pgEnum('reaction_type', [
     'angry',
 ])
 
+export const panelCountSchema = createSelectSchema(reactionType)
+
+export const MAX_PANEL_ROWS = 4 as const
+export const MAX_PANEL_COLUMNS = 4 as const
+export const MAX_PANEL_COUNT = MAX_PANEL_ROWS * MAX_PANEL_COLUMNS
+
+export const comicOptionsConfig = {
+    drawOver: {
+        name: 'drawOver',
+        label: 'Draw Over',
+        description: 'Draw over the comic',
+        default: false,
+        type: 'boolean',
+    },
+    disableComments: {
+        name: 'disableComments',
+        label: 'Disable Comments',
+        description: 'Disable comments on the comic',
+        default: false,
+        type: 'boolean',
+    },
+} as const
+
 export const comicPanelSplitType = pgEnum('comic_panel_split_type', [
     'auto',
     'grid',
@@ -41,6 +66,8 @@ export const comicPanelSplitType = pgEnum('comic_panel_split_type', [
 ])
 
 export const comicPanelSplitTypeSchema = createSelectSchema(comicPanelSplitType)
+
+// DB SCHEMA
 
 export const reactions = pgTable(
     'reactions',
@@ -273,13 +300,22 @@ export const comics = pgTable(
         description: text(),
         seriesId: text('series_id'),
         collectionId: uuid('collection_id'),
-        language: text().default("'en'"),
+        language: text('language').notNull(),
         panelSplitType: comicPanelSplitType('panel_split_type'), // if null, panels are not split
         panelCount: integer('panel_count').notNull(),
-        disableComments: boolean('disable_comments').default(false),
-        drawOver: boolean('draw_over').default(false),
+        panelRows: integer('panel_rows').notNull(),
+        panelColumns: integer('panel_columns').notNull(),
         visibility: contentVisibility('visibility').default('public'),
-        // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+        // disableComments: boolean('disable_comments').default(false),
+        // drawOver: boolean('draw_over').default(false),
+        options: jsonb('options')
+            .default({
+                [comicOptionsConfig.drawOver.name]:
+                    comicOptionsConfig.drawOver.default,
+                [comicOptionsConfig.disableComments.name]:
+                    comicOptionsConfig.disableComments.default,
+            })
+            .notNull(),
         totalViews: bigint('total_views', { mode: 'number' }).default(sql`'0'`),
         userId: uuid('user_id')
             .default(sql`auth.uid()`)
@@ -318,6 +354,13 @@ export const comics = pgTable(
         })
             .onUpdate('cascade')
             .onDelete('set null'),
+        foreignKey({
+            columns: [table.language],
+            foreignColumns: [languages.code],
+            name: 'comics_language_code_fkey',
+        })
+            .onUpdate('cascade')
+            .onDelete('restrict'),
 
         pgPolicy('Enable insert for authenticated users only', {
             as: 'permissive',
@@ -349,6 +392,18 @@ export const comics = pgTable(
         check('comics_title_check', sql`length(title) < 50`),
         check('comics_total_reactions_check', sql`total_reactions >= 0`),
         check('comics_total_views_check', sql`total_views >= 0`),
+        check('comics_panel_count_check', sql`panel_count > 0`),
+        check('comics_panel_rows_check', sql`panel_rows > 0`),
+        check('comics_panel_columns_check', sql`panel_columns > 0`),
+        check('comics_panel_rows_check', sql`panel_rows <= ${MAX_PANEL_ROWS}`),
+        check(
+            'comics_panel_columns_check',
+            sql`panel_columns <= ${MAX_PANEL_COLUMNS}`
+        ),
+        check(
+            'comics_panel_count_check',
+            sql`panel_count <= ${MAX_PANEL_COUNT}`
+        ),
     ]
 )
 
@@ -672,6 +727,8 @@ export const tags = pgTable(
     ]
 )
 
+export const tagsSelectSchema = createSelectSchema(tags)
+
 export const reports = pgTable(
     'reports',
     {
@@ -751,6 +808,8 @@ export const genres = pgTable(
         }),
     ]
 )
+
+export const genresSelectSchema = createSelectSchema(genres)
 
 export const seriesGenres = pgTable(
     'series_genres',
@@ -841,3 +900,25 @@ export const comicPanelCount = pgTable(
         }),
     ]
 )
+
+export const languages = pgTable(
+    'languages',
+    {
+        id: uuid().defaultRandom().primaryKey().notNull(),
+        name: text().notNull(),
+        code: text().notNull(),
+        flag: text().notNull(),
+        isRTL: boolean('is_rtl').default(false).notNull(),
+    },
+    (table) => [
+        unique('languages_code_key').on(table.code),
+        pgPolicy('Enable read access for all users', {
+            as: 'permissive',
+            for: 'select',
+            to: ['public'],
+            using: sql`true`,
+        }),
+    ]
+)
+
+export const languagesSelectSchema = createSelectSchema(languages)

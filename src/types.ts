@@ -1,8 +1,15 @@
 import {
+    genresSelectSchema,
+    languagesSelectSchema,
+    seriesSelectSchema,
+    tagsSelectSchema,
+} from '@/db/schema'
+import {
     InputHTMLAttributes,
     SelectHTMLAttributes,
     TextareaHTMLAttributes,
 } from 'react'
+import { z } from 'zod'
 
 export type TActionResponse = {
     isError?: boolean
@@ -12,6 +19,8 @@ export type TActionResponse = {
 export type TActionResponseWithPayload<T> = TActionResponse & {
     data?: T
 }
+
+// ------------------- FORM TYPES -------------------
 
 export type TFormField<S> = {
     fieldLabel: string
@@ -53,7 +62,7 @@ export type TAutocompleteInputFieldProps = {
 
 export type TFormAutocompleteInputField<S> = TFormField<S> &
     Omit<TAutocompleteInputFieldProps, 'loading' | 'suggestions'> & {
-        suggestions: SuggestionSource
+        suggestions: TSuggestionSource
     }
 
 export type TFormTagInputField<S> = TFormField<S>
@@ -63,4 +72,16 @@ export type TFormComboBoxField<S> = TFormField<S> & {
     multiple?: boolean
 } & InputHTMLAttributes<HTMLInputElement>
 
-export type SuggestionSource = string[] | ((query: string) => Promise<string[]>)
+export type TSuggestionSource =
+    | string[]
+    | ((query: string) => Promise<string[]>)
+
+// ------------------- APP TYPES -------------------
+
+export type TGenre = z.infer<typeof genresSelectSchema>
+
+export type TLanguage = z.infer<typeof languagesSelectSchema>
+
+export type TTag = z.infer<typeof tagsSelectSchema>
+
+export type TSeries = z.infer<typeof seriesSelectSchema>
