@@ -10,11 +10,11 @@ export default function LabelNewBadgeButton({
     return (
         <button
             {...props}
-            className={`btn btn-xs btn-secondary h-5 ${props.className}`}
+            className={`btn btn-xs btn-secondary rounded-[var(--radius-field)] h-5 ${props.className}`}
             type="button"
         >
             {label}
-            <PlusIcon className="h-4 w-4" />
+            <PlusIcon className="h-3 w-3" />
         </button>
     )
 }

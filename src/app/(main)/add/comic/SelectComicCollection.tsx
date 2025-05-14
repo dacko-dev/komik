@@ -71,6 +71,7 @@ export default function SelectComicCollection<S>({
                                     label={s.name}
                                     thumbnail={s.thumbnail}
                                     value={s.id}
+                                    type="radio"
                                     checked={field.value === s.id}
                                     onChange={() => field.onChange(s.id)}
                                     onClick={() => {

@@ -7,7 +7,7 @@ import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormF
 import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
 
-export function FormSelectWithLabel<S>({
+export function FormSelect<S>({
     fieldLabel,
     fieldDescription,
     nameInSchema,
@@ -25,11 +25,13 @@ export function FormSelectWithLabel<S>({
             name={nameInSchema}
             render={({ field, fieldState }) => (
                 <fieldset className={`fieldset ${wrapperClassName}`}>
-                    <FormFieldLabel
-                        fieldLabel={fieldLabel}
-                        htmlFor={nameInSchema}
-                        className={labelClassName}
-                    />
+                    {fieldLabel && (
+                        <FormFieldLabel
+                            fieldLabel={fieldLabel}
+                            htmlFor={nameInSchema}
+                            className={labelClassName}
+                        />
+                    )}
                     <select
                         id={nameInSchema}
                         className={`select ${

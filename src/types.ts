@@ -1,6 +1,9 @@
 import {
+    comicLayoutSchema,
+    comicOptionsConfig,
     genresSelectSchema,
     languagesSelectSchema,
+    panelInfoSchema,
     seriesSelectSchema,
     tagsSelectSchema,
 } from '@/db/schema'
@@ -23,7 +26,7 @@ export type TActionResponseWithPayload<T> = TActionResponse & {
 // ------------------- FORM TYPES -------------------
 
 export type TFormField<S> = {
-    fieldLabel: string
+    fieldLabel?: string
     fieldDescription?: string
     labelClassName?: string
     wrapperClassName?: string
@@ -85,3 +88,34 @@ export type TLanguage = z.infer<typeof languagesSelectSchema>
 export type TTag = z.infer<typeof tagsSelectSchema>
 
 export type TSeries = z.infer<typeof seriesSelectSchema>
+
+type TOptionConfig = typeof comicOptionsConfig
+
+export type InferOptionValue<T> = T extends { type: 'boolean' }
+    ? boolean
+    : T extends { type: 'string' }
+    ? string
+    : T extends { type: 'number' }
+    ? number
+    : T extends { type: 'date' }
+    ? Date
+    : T extends { type: 'object' }
+    ? object
+    : T extends { type: 'array' }
+    ? unknown[]
+    : T extends { type: 'null' }
+    ? null
+    : T extends { type: 'undefined' }
+    ? undefined
+    : T extends { type: 'any' }
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
+    : unknown
+
+export type TComicOptions = {
+    [K in keyof TOptionConfig]: InferOptionValue<TOptionConfig[K]>
+}
+
+export type TPanelInfo = z.infer<typeof panelInfoSchema>
+
+export type TComicLayout = z.infer<typeof comicLayoutSchema>

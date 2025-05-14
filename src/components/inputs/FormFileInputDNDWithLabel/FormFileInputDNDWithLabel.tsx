@@ -205,15 +205,24 @@ export function FormFileInputDNDWithLabel<S>({
                                                 key={index}
                                                 className="w-36 h-36 flex self-center justify-self-center items-center justify-between group rounded-lg overflow-hidden relative"
                                             >
-                                                <Image
-                                                    src={URL.createObjectURL(
-                                                        file
-                                                    )}
-                                                    alt={file.name}
-                                                    className="w-full h-full object-cover"
-                                                    width={100}
-                                                    height={100}
-                                                />
+                                                {file.type.startsWith(
+                                                    'image/'
+                                                ) ? (
+                                                    <Image
+                                                        src={URL.createObjectURL(
+                                                            file
+                                                        )}
+                                                        alt={file.name}
+                                                        className="w-full h-full object-cover"
+                                                        width={100}
+                                                        height={100}
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <Upload size={40} />
+                                                    </div>
+                                                )}
+
                                                 <div className="flex transition-all select-none flex-col group-hover:opacity-100 opacity-0 absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
                                                     <span className="text-sm font-semibold">
                                                         {file.name}

@@ -16,7 +16,7 @@ export default function CardSelectInput({
 
     return (
         <div
-            className={`flex flex-col shrink-0 h-36 w-36 rounded-sm overflow-hidden border-2 transition-all
+            className={`flex flex-col shrink-0 rounded-sm overflow-hidden border-2 transition-all
         ${
             checked
                 ? 'bg-secondary text-secondary-content border-secondary'
@@ -28,7 +28,7 @@ export default function CardSelectInput({
                 htmlFor={id}
                 className="cursor-pointer h-full w-full flex flex-col items-center justify-center"
             >
-                <div className="w-full grow flex items-center justify-center overflow-hidden rounded-sm">
+                <div className="w-full grow aspect-square flex items-center justify-center overflow-hidden rounded-sm">
                     {thumbnail ? (
                         <Image
                             src={thumbnail}
@@ -43,7 +43,12 @@ export default function CardSelectInput({
                         </div>
                     )}
                 </div>
-                <div className="text-sm text-center p-1 whitespace-nowrap text-nowrap">
+
+                {/* TODO: Fix label wrapping */}
+                <div
+                    title={label}
+                    className="text-sm text-center p-1  w-full truncate"
+                >
                     {label}
                 </div>
             </label>
