@@ -19,6 +19,16 @@ import FormComboboxWithLabel from '@/components/inputs/FormComboboxWithLabel/For
 import SelectComicCollection from '@/app/(main)/add/comic/SelectComicCollection'
 import { TGenre, TLanguage, TSeries } from '@/types'
 import AddComicPanelLayoutMaker from '@/app/(main)/add/comic/AddComicPanelLayoutMaker'
+import { MAX_PANEL_COUNT, MIN_PANEL_COUNT } from '@/constants'
+
+const AddComicPanelSchema = z.object({
+    id: z.string(),
+    file: fileSchema,
+    previewUrl: z.string(),
+    order: z.number(),
+})
+
+export type TAddComicPanel = z.infer<typeof AddComicPanelSchema>
 
 const AddComicSchema = z.object({
     title: z.string(),
@@ -30,12 +40,10 @@ const AddComicSchema = z.object({
     visibility: contentVisibilitySchema,
     panelLayoutColumns: z.number(),
     panelLayoutRows: z.number(),
-    panels: z.array(
-        z.object({
-            image: fileSchema,
-            order: z.number(),
-        })
-    ),
+    panels: z
+        .array(AddComicPanelSchema)
+        .min(MIN_PANEL_COUNT, `At least ${MIN_PANEL_COUNT} panel is required`)
+        .max(MAX_PANEL_COUNT, `Maximum ${MAX_PANEL_COUNT} panels are allowed`),
     language: z.string(),
 
     // comicOptionsConfig
@@ -77,6 +85,8 @@ export default function AddComicForm({
             tags: [],
             panels: [],
             visibility: 'public',
+            panelLayoutColumns: 1,
+            panelLayoutRows: 1,
         },
         shouldFocusError: true,
         resolver: zodResolver(AddComicSchema),

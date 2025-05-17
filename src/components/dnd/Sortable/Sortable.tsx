@@ -33,9 +33,13 @@ import {
     AnimateLayoutChanges,
     NewIndexGetter,
 } from '@dnd-kit/sortable'
-import { createRange } from '@/lib/utils'
 import Wrapper from '@/components/dnd/Wrapper/Wrapper'
 import { Item } from '@/components/dnd/Item/Item'
+
+interface ISortableItemValue {
+    id: UniqueIdentifier
+    [key: string]: any
+}
 
 export interface SortableProps {
     activationConstraint?: PointerActivationConstraint
@@ -48,7 +52,7 @@ export interface SortableProps {
     getNewIndex?: NewIndexGetter
     handle?: boolean
     itemCount?: number
-    items?: UniqueIdentifier[]
+    items?: ISortableItemValue[]
     measuring?: MeasuringConfiguration
     modifiers?: Modifiers
     renderItem?: any
@@ -62,7 +66,7 @@ export interface SortableProps {
     rows?: number
     useDragOverlay?: boolean
     getItemStyles?(args: {
-        id: UniqueIdentifier
+        id: ISortableItemValue['id']
         index: number
         isSorting: boolean
         isDragOverlay: boolean
@@ -73,9 +77,9 @@ export interface SortableProps {
         active: Pick<Active, 'id'> | null
         index: number
         isDragging: boolean
-        id: UniqueIdentifier
+        id: ISortableItemValue['id']
     }): React.CSSProperties
-    isDisabled?(id: UniqueIdentifier): boolean
+    isDisabled?(id: ISortableItemValue['id']): boolean
 }
 
 const dropAnimationConfig: DropAnimation = {
@@ -96,19 +100,17 @@ const screenReaderInstructions: ScreenReaderInstructions = {
   `,
 }
 
-export function Sortable({
+export function Sortable<T extends ISortableItemValue>({
     activationConstraint,
     animateLayoutChanges,
     adjustScale = false,
-    // Container = List,
     collisionDetection = closestCenter,
     coordinateGetter = sortableKeyboardCoordinates,
     dropAnimation = dropAnimationConfig,
     getItemStyles = () => ({}),
     getNewIndex,
     handle = false,
-    itemCount = 8,
-    items: initialItems,
+    items: initialItems = [],
     isDisabled = () => false,
     measuring,
     modifiers,
@@ -122,12 +124,8 @@ export function Sortable({
     useDragOverlay = true,
     wrapperStyle = () => ({}),
 }: SortableProps) {
-    const [items, setItems] = useState<UniqueIdentifier[]>(
-        () =>
-            initialItems ??
-            createRange<UniqueIdentifier>(itemCount, (index) => index)
-    )
-    const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
+    const [items, setItems] = useState<T[]>(initialItems as T[])
+    const [activeId, setActiveId] = useState<T['id'] | null>(null)
     const sensors = useSensors(
         useSensor(MouseSensor, {
             activationConstraint,
@@ -142,12 +140,13 @@ export function Sortable({
         })
     )
     const isFirstAnnouncement = useRef(true)
-    const getIndex = (id: UniqueIdentifier) => items.indexOf(id)
-    const getPosition = (id: UniqueIdentifier) => getIndex(id) + 1
+    const getIndex = (id: ISortableItemValue['id']) =>
+        items.findIndex((item) => item.id === id)
+    const getPosition = (id: ISortableItemValue['id']) => getIndex(id) + 1
     const activeIndex = activeId != null ? getIndex(activeId) : -1
     const handleRemove = removable
         ? (id: UniqueIdentifier) =>
-              setItems((items) => items.filter((item) => item !== id))
+              setItems((items) => items.filter((item) => item.id !== id))
         : undefined
     const announcements: Announcements = {
         onDragStart({ active: { id } }) {
@@ -238,13 +237,13 @@ export function Sortable({
                     {items.map((value, index) => (
                         <SortableItem
                             className={itemClassName}
-                            key={value}
-                            id={value}
+                            key={value['id']}
+                            id={value['id']}
                             handle={handle}
                             index={index}
                             style={getItemStyles}
                             wrapperStyle={wrapperStyle}
-                            disabled={isDisabled(value)}
+                            disabled={isDisabled(value['id'])}
                             renderItem={renderItem}
                             onRemove={handleRemove}
                             animateLayoutChanges={animateLayoutChanges}
@@ -264,17 +263,17 @@ export function Sortable({
                           {activeId != null ? (
                               <Item
                                   className={itemClassName}
-                                  value={items[activeIndex]}
+                                  value={items[activeIndex]['id']}
                                   handle={handle}
                                   renderItem={renderItem}
                                   wrapperStyle={wrapperStyle({
                                       active: { id: activeId },
                                       index: activeIndex,
                                       isDragging: true,
-                                      id: items[activeIndex],
+                                      id: items[activeIndex]['id'],
                                   })}
                                   style={getItemStyles({
-                                      id: items[activeIndex],
+                                      id: items[activeIndex]['id'],
                                       index: activeIndex,
                                       isSorting: activeId !== null,
                                       isDragging: true,
@@ -296,11 +295,11 @@ interface SortableItemProps {
     animateLayoutChanges?: AnimateLayoutChanges
     disabled?: boolean
     getNewIndex?: NewIndexGetter
-    id: UniqueIdentifier
+    id: ISortableItemValue['id']
     index: number
     handle: boolean
     useDragOverlay?: boolean
-    onRemove?(id: UniqueIdentifier): void
+    onRemove?(id: ISortableItemValue['id']): void
     style(values: any): React.CSSProperties
     renderItem?(args: any): React.ReactElement
     wrapperStyle: SortableProps['wrapperStyle']

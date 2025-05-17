@@ -8,5 +8,5 @@ export const fileSchema = z
         return file.size < 1024 * 1024 * 5
     }, `File size must be less than ${byteToKb(FILE_MAX_SIZE)}kb`)
     .refine((file) => {
-        return FILE_ACCEPTED_TYPES.includes(file.type)
+        return (FILE_ACCEPTED_TYPES as readonly string[]).includes(file.type)
     }, `File type must be one of ${FILE_ACCEPTED_TYPES.map((type) => type.split('/')[1]).join(', ')}`)
