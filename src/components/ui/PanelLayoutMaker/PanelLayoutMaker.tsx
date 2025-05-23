@@ -82,7 +82,7 @@ export default function PanelLayoutMaker({
                 </div>
 
                 {panels.length > 0 ? (
-                    <Sortable
+                    <Sortable<TAddComicPanel>
                         {...props}
                         className={
                             'grid grid-cols-[repeat(var(--columns),1fr)] grid-rows-[repeat(var(--rows),minmax(0,1fr))]'

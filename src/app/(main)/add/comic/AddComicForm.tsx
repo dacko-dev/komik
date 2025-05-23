@@ -87,6 +87,7 @@ export default function AddComicForm({
             visibility: 'public',
             panelLayoutColumns: 1,
             panelLayoutRows: 1,
+            // options:
         },
         shouldFocusError: true,
         resolver: zodResolver(AddComicSchema),

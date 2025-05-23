@@ -148,12 +148,18 @@
     --breakpoint-3xl: 1920px;
     --main-grid-cols: 1fr minmax(900px, 1fr) 1fr;
     --main-grid-rows: auto 1fr;
+}
 
+/*  ---- BASE ---- */
+
+:root {
     --opacity-dragging-dnd: 0.5;
     --scale-dnd: 1.05;
 
     --animate-fade-in: fadeIn 0.5s ease;
     --animate-pop: pop 0.2s cubic-bezier(0.18, 0.67, 0.6, 1.22);
+
+    --box-shadow-picked-up: 0 0 0 0.25rem rgba(0, 0, 0, 0.5);
 
     @keyframes pop {
         0% {
@@ -172,11 +178,13 @@
             opacity: 1;
         }
     }
-}
 
-/*  ---- BASE ---- */
-
-:root {
+    .fade-in {
+        animation: fadeIn var(--animate-fade-in);
+    }
+    .pop {
+        animation: pop var(--animate-pop);
+    }
 }
 
 body {

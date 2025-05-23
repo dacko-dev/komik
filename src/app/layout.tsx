@@ -33,6 +33,7 @@ export default function RootLayout({
             >
                 <Toaster
                     toastOptions={{
+                        position: 'bottom-right',
                         className: 'alert',
                         success: {
                             className: 'alert-success',

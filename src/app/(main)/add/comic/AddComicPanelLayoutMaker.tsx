@@ -29,19 +29,23 @@ export default function AddComicPanelLayoutMaker<S>({
         (files: FileList | File[] | null) => {
             if (!files) return
 
+            const parsedFiles: File[] = []
             Array.from(files).forEach((file) => {
                 const result = fileSchema.safeParse(file)
                 if (!result.success) {
+                    console.log('error', result.error.issues[0].message)
                     toast.error(
-                        result.error?.message || `File ${file.name} is invalid`
+                        result.error.issues[0].message ||
+                            `File ${file.name} is invalid`
                     )
                     return
                 }
+                parsedFiles.push(file)
             })
 
             const newPanels: TAddComicPanel[] = []
 
-            Array.from(files).forEach((file, index) => {
+            Array.from(parsedFiles).forEach((file, index) => {
                 const reader = new FileReader()
 
                 reader.onload = (event) => {
