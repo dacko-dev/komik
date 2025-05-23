@@ -163,10 +163,14 @@
 
     @keyframes pop {
         0% {
-            @apply scale-100 shadow-none;
+            /* @apply scale-100 shadow-none; */
+            transform: scale(1);
+            box-shadow: 0;
         }
         100% {
-            @apply scale-105 shadow-lg;
+            /* @apply scale-105 shadow-lg; */
+            transform: scale(1.05);
+            box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.5);
         }
     }
 
