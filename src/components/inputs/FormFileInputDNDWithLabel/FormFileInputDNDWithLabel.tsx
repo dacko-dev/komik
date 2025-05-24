@@ -6,7 +6,6 @@ import { Upload, Image as ImageIcon, TrashIcon } from 'lucide-react'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
 import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormFieldDescription'
 import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'
-import { byteToKb } from '@/lib/utils'
 import Image from 'next/image'
 
 type Props<S> = {
@@ -35,47 +34,47 @@ export function FormFileInputDNDWithLabel<S>({
     const [isDragging, setIsDragging] = useState(false)
     const dropElementRef = useRef<HTMLDivElement>(null)
 
-    const checkForErrors = useCallback(
-        (files: File[]) => {
-            let isError = false
+    // const checkForErrors = useCallback(
+    //     (files: File[]) => {
+    //         let isError = false
 
-            if (maxFileCount && files.length > maxFileCount) {
-                isError = true
-                form.setError(
-                    nameInSchema,
-                    {
-                        type: 'maxLength',
-                        message: `You can only upload a maximum of ${maxFileCount} ${
-                            maxFileCount > 1 ? 'files' : 'file'
-                        }.`,
-                    },
-                    { shouldFocus: true }
-                )
-            }
+    //         if (maxFileCount && files.length > maxFileCount) {
+    //             isError = true
+    //             form.setError(
+    //                 nameInSchema,
+    //                 {
+    //                     type: 'maxLength',
+    //                     message: `You can only upload a maximum of ${maxFileCount} ${
+    //                         maxFileCount > 1 ? 'files' : 'file'
+    //                     }.`,
+    //                 },
+    //                 { shouldFocus: true }
+    //             )
+    //         }
 
-            if (maxFileSize) {
-                const totalSize = files.reduce(
-                    (acc, file) => acc + file.size,
-                    0
-                )
-                if (totalSize > maxFileSize) {
-                    isError = true
-                    form.setError(
-                        nameInSchema,
-                        {
-                            type: 'max',
-                            message: `The total file size exceeds the maximum limit of ${byteToKb(
-                                maxFileSize
-                            )} KB.`,
-                        },
-                        { shouldFocus: true }
-                    )
-                }
-            }
-            return isError
-        },
-        [form, nameInSchema, maxFileSize, maxFileCount]
-    )
+    //         if (maxFileSize) {
+    //             const totalSize = files.reduce(
+    //                 (acc, file) => acc + file.size,
+    //                 0
+    //             )
+    //             if (totalSize > maxFileSize) {
+    //                 isError = true
+    //                 form.setError(
+    //                     nameInSchema,
+    //                     {
+    //                         type: 'max',
+    //                         message: `The total file size exceeds the maximum limit of ${byteToKb(
+    //                             maxFileSize
+    //                         )} KB.`,
+    //                     },
+    //                     { shouldFocus: true }
+    //                 )
+    //             }
+    //         }
+    //         return isError
+    //     },
+    //     [form, nameInSchema, maxFileSize, maxFileCount]
+    // )
 
     const handleDragOver = useCallback((event: React.DragEvent) => {
         event.preventDefault()
