@@ -1,3 +1,5 @@
+'use client'
+
 import LabelNewBadgeButton from '@/components/buttons/LabelNewBadgeButton/LabelNewBadgeButton'
 import AddCollectionForm from '@/components/forms/AddCollectionForm/AddCollectionForm'
 import Modal from '@/components/ui/Modal/Modal'
@@ -80,53 +82,6 @@ export default function SelectComicCollection<S>({
                                         }
                                     }}
                                 />
-                                // <div
-                                //     key={s.id}
-                                //     className={`flex flex-col shrink-0 h-36 w-36 rounded-sm overflow-hidden transition-all border-2
-                                //             ${
-                                //                 field.value === s.id
-                                //                     ? 'bg-secondary text-secondary-content border-secondary'
-                                //                     : 'bg-base-200 border-base-200'
-                                //             }
-                                //         `}
-                                // >
-                                //     <label
-                                //         htmlFor={`${nameInSchema}-${s.id}`}
-                                //         className="cursor-pointer h-full w-full flex flex-col items-center justify-center"
-                                //     >
-                                //         <div className="w-full grow flex items-center justify-center overflow-hidden rounded-sm">
-                                //             {s.thumbnail ? (
-                                //                 <Image
-                                //                     src={s.thumbnail}
-                                //                     alt={s.name}
-                                //                     className="w-full grow h-full object-cover object-center"
-                                //                     width={200}
-                                //                     height={100}
-                                //                 />
-                                //             ) : (
-                                //                 <div className="w-full h-auto flex items-center justify-center">
-                                //                     <ImageIcon />
-                                //                 </div>
-                                //             )}
-                                //         </div>
-                                //         <div className="text-sm text-center p-1">
-                                //             {s.name}
-                                //         </div>
-                                //     </label>
-                                //     <input
-                                //         id={`${nameInSchema}-${s.id}`}
-                                //         type="radio"
-                                //         value={s.id}
-                                //         checked={field.value === s.id}
-                                //         onChange={() => field.onChange(s.id)}
-                                //         onClick={() => {
-                                //             if (field.value === s.id) {
-                                //                 field.onChange('')
-                                //             }
-                                //         }}
-                                //         className="hidden"
-                                //     />
-                                // </div>
                             ))}
                         </ScrollableCarousel>
                     ) : (

@@ -2,7 +2,7 @@ import FormComboboxWithLabel from '@/components/inputs/FormComboboxWithLabel/For
 import { FormFileInputDNDWithLabel } from '@/components/inputs/FormFileInputDNDWithLabel/FormFileInputDNDWithLabel'
 import { FormInputWithLabel } from '@/components/inputs/FormInputWithLabel/FormInputWithLabel'
 import { FormTextareaWithLabel } from '@/components/inputs/FormTextareaWithLabel/FormTextareaWithLabel'
-import { FILE_MAX_SIZE } from '@/constants'
+import { FILE_MAX_SIZE } from '@/appConfig'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'

@@ -1,3 +1,5 @@
+'use client'
+
 import { ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import { InputHTMLAttributes } from 'react'

@@ -1,4 +1,9 @@
 import {
+    PANEL_BORDER_WIDTHS,
+    PANEL_GAPS,
+    PANEL_READING_MODES,
+} from '@/appConfig'
+import {
     comicLayoutSchema,
     comicOptionsConfig,
     genresSelectSchema,
@@ -119,3 +124,7 @@ export type TComicOptions = {
 export type TPanelInfo = z.infer<typeof panelInfoSchema>
 
 export type TComicLayout = z.infer<typeof comicLayoutSchema>
+
+export type TPanelBorderWidth = keyof typeof PANEL_BORDER_WIDTHS
+export type TPanelGaps = keyof typeof PANEL_GAPS
+export type TPanelReadingMode = (typeof PANEL_READING_MODES)[number]

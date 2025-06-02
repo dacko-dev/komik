@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { CSSProperties } from 'react'
+import clsx from 'clsx'
 
 export interface ActionProps extends React.HTMLAttributes<HTMLButtonElement> {
     active?: {
@@ -7,7 +7,6 @@ export interface ActionProps extends React.HTMLAttributes<HTMLButtonElement> {
         background: string
     }
     cursor?: CSSProperties['cursor']
-    ref?: React.Ref<HTMLButtonElement>
 }
 
 export default function Action({
@@ -15,23 +14,26 @@ export default function Action({
     className,
     cursor,
     style,
-    ref,
     ...props
 }: ActionProps) {
     return (
         <button
-            ref={ref}
             {...props}
-            className={`btn btn-square btn-xs ${className}`}
+            type="button"
             tabIndex={0}
             style={
                 {
                     ...style,
                     cursor,
-                    // '--fill': active?.fill,
-                    // '--background': active?.background,
+                    '--fill': active?.fill,
+                    '--background': active?.background,
                 } as CSSProperties
             }
+            className={clsx(
+                'flex items-center justify-center',
+                'outline-none',
+                className
+            )}
         />
     )
 }

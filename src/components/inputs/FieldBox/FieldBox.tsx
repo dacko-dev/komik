@@ -22,7 +22,7 @@ export default function FieldBox({
 }) {
     return (
         <fieldset
-            className={`fieldset bg-base-200 border border-base-300 p-4 rounded-field w-full ${className}`}
+            className={`fieldset bg-base-200/50 border border-base-300 p-4 rounded-field w-full ${className}`}
         >
             <legend className="fieldset-legend select-none p-0">
                 {capitalizeAll(fieldLabel)}

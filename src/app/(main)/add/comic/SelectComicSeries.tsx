@@ -1,3 +1,5 @@
+'use client'
+
 import LabelNewBadgeButton from '@/components/buttons/LabelNewBadgeButton/LabelNewBadgeButton'
 import AddSeriesForm from '@/components/forms/AddSeriesForm/AddSeriesForm'
 import Modal from '@/components/ui/Modal/Modal'
