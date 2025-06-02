@@ -60,15 +60,3 @@ export function stringToZodType(strType: TStringToZodType) {
             return z.set(z.unknown())
     }
 }
-
-// dnd-kit
-const defaultInitializer = (index: number) => index
-
-// dnd-kit
-export function createRange<T = number>(
-    length: number,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    initializer: (index: number) => any = defaultInitializer
-): T[] {
-    return [...new Array(length)].map((_, index) => initializer(index))
-}

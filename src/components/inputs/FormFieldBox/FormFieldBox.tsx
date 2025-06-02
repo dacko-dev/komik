@@ -44,7 +44,7 @@ export default function FormFieldBox<S>({
                             <label
                                 htmlFor={option}
                                 key={option}
-                                className={`fieldset-label text-base select-none `}
+                                className={`fieldset-label text-base select-none`}
                             >
                                 <input
                                     type={inputType}
@@ -59,7 +59,38 @@ export default function FormFieldBox<S>({
                                     `}
                                     id={option}
                                     aria-label={option}
-                                    {...field}
+                                    // {...field}
+                                    {...(inputType === 'radio'
+                                        ? {
+                                              ...field,
+                                              checked: field.value === option,
+                                              onChange: (e) =>
+                                                  field.onChange(
+                                                      e.target.checked
+                                                          ? option
+                                                          : ''
+                                                  ),
+                                          }
+                                        : {
+                                              ...field,
+                                              value: option,
+                                              onChange: (e) => {
+                                                  const isChecked =
+                                                      e.target.checked
+                                                  const currentValue =
+                                                      field.value || []
+                                                  const newValue = isChecked
+                                                      ? [
+                                                            ...currentValue,
+                                                            option,
+                                                        ]
+                                                      : currentValue.filter(
+                                                            (v) => v !== option
+                                                        )
+                                                  field.onChange(newValue)
+                                              },
+                                          })}
+                                    name={nameInSchema}
                                 />
                                 {capitalizeFirst(option)}
                             </label>

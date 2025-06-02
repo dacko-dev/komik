@@ -19,7 +19,7 @@ import { authenticatedRole, authUsers } from 'drizzle-orm/supabase'
 import { createSelectSchema } from 'drizzle-zod'
 import { TComicOptions, TPanelInfo } from '@/types'
 import { z } from 'zod'
-import { MAX_PANEL_COLUMNS, MAX_PANEL_COUNT, MAX_PANEL_ROWS } from '@/constants'
+import { MAX_PANEL_COLUMNS, MAX_PANEL_COUNT, MAX_PANEL_ROWS } from '@/appConfig'
 
 // ENUMS & VALUES
 export const contentVisibility = pgEnum('content_visibility', [
@@ -56,6 +56,13 @@ export const comicOptionsConfig = {
         type: 'boolean',
     },
 } as const
+
+export const comicOptionsDefaults = Object.fromEntries(
+    Object.entries(comicOptionsConfig).map(([, value]) => [
+        value.name,
+        value.default,
+    ])
+)
 
 export const comicLayout = pgEnum('panel_layout', ['grid', 'custom'])
 export const comicLayoutSchema = createSelectSchema(comicLayout)

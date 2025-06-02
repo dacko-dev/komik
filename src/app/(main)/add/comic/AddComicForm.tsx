@@ -3,13 +3,17 @@
 import { FormInputWithLabel } from '@/components/inputs/FormInputWithLabel/FormInputWithLabel'
 import { FormSelect } from '@/components/inputs/FormSelect/FormSelect'
 import { FormTextareaWithLabel } from '@/components/inputs/FormTextareaWithLabel/FormTextareaWithLabel'
-import { fileSchema } from '@/lib/schemas/appLogicSchema'
+import { colorSchema, fileSchema } from '@/lib/schemas/appLogicSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import Modal from '@/components/ui/Modal/Modal'
-import { comicOptionsConfig, contentVisibilitySchema } from '@/db/schema'
+import {
+    comicOptionsConfig,
+    comicOptionsDefaults,
+    contentVisibilitySchema,
+} from '@/db/schema'
 import { stringToZodType } from '@/lib/utils'
 import FormFieldBox from '@/components/inputs/FormFieldBox/FormFieldBox'
 import OptionsComicForm from '@/app/(main)/add/comic/OptionsComicForm'
@@ -17,9 +21,21 @@ import FormTagInput from '@/components/inputs/FormTagInput/FormTagInput'
 import SelectComicSeries from '@/app/(main)/add/comic/SelectComicSeries'
 import FormComboboxWithLabel from '@/components/inputs/FormComboboxWithLabel/FormComboboxWithLabel'
 import SelectComicCollection from '@/app/(main)/add/comic/SelectComicCollection'
-import { TGenre, TLanguage, TSeries } from '@/types'
+import {
+    TGenre,
+    TLanguage,
+    TPanelBorderWidth,
+    TPanelGaps,
+    TSeries,
+} from '@/types'
 import AddComicPanelLayoutMaker from '@/app/(main)/add/comic/AddComicPanelLayoutMaker'
-import { MAX_PANEL_COUNT, MIN_PANEL_COUNT } from '@/constants'
+import {
+    MAX_PANEL_COUNT,
+    MIN_PANEL_COUNT,
+    PANEL_BORDER_WIDTHS,
+    PANEL_GAPS,
+    PANEL_READING_MODES,
+} from '@/appConfig'
 
 const AddComicPanelSchema = z.object({
     id: z.string(),
@@ -37,14 +53,22 @@ const AddComicSchema = z.object({
     tags: z.array(z.string()),
     seriesId: z.string().optional().nullable(),
     collectionId: z.string().optional().nullable(),
+
     visibility: contentVisibilitySchema,
     panelLayoutColumns: z.number(),
-    panelLayoutRows: z.number(),
+    panelLayoutBorderWidth: z.enum(
+        Object.keys(PANEL_BORDER_WIDTHS) as [TPanelBorderWidth]
+    ),
+    panelLayoutRounded: z.boolean(),
+    panelLayoutGapX: z.enum(Object.keys(PANEL_GAPS) as [TPanelGaps]),
+    panelLayoutGapY: z.enum(Object.keys(PANEL_GAPS) as [TPanelGaps]),
+    panelLayoutBackgroundColor: colorSchema.optional(),
+    panelLayoutReadingMode: z.enum(PANEL_READING_MODES),
     panels: z
         .array(AddComicPanelSchema)
         .min(MIN_PANEL_COUNT, `At least ${MIN_PANEL_COUNT} panel is required`)
         .max(MAX_PANEL_COUNT, `Maximum ${MAX_PANEL_COUNT} panels are allowed`),
-    language: z.string(),
+    languageId: z.string().optional(),
 
     // comicOptionsConfig
     options: z.object(
@@ -84,10 +108,15 @@ export default function AddComicForm({
             description: '',
             tags: [],
             panels: [],
+            panelLayoutBackgroundColor: '#ffffff',
             visibility: 'public',
             panelLayoutColumns: 1,
-            panelLayoutRows: 1,
-            // options:
+            panelLayoutBorderWidth: 'None',
+            panelLayoutRounded: false,
+            panelLayoutGapX: 'None',
+            panelLayoutGapY: 'None',
+            panelLayoutReadingMode: 'ltr',
+            options: comicOptionsDefaults,
         },
         shouldFocusError: true,
         resolver: zodResolver(AddComicSchema),
@@ -98,6 +127,8 @@ export default function AddComicForm({
     const onSubmit = useCallback((data: TAddComicForm) => {
         console.log(data)
     }, [])
+
+    console.log('form data', methods.getValues())
 
     return (
         <FormProvider {...methods}>
@@ -122,7 +153,7 @@ export default function AddComicForm({
 
                 <FormSelect<TAddComicForm>
                     fieldLabel="Language"
-                    nameInSchema="language"
+                    nameInSchema="languageId"
                     options={languages.map((language) => ({
                         value: language.id,
                         label: language.name,
@@ -130,14 +161,6 @@ export default function AddComicForm({
                     wrapperClassName="w-full"
                     selectClassName="w-full"
                 />
-
-                {/* TODO: create grid layout DND file input */}
-                {/* <FormFileInputDNDWithLabel
-                    maxFileCount={MAX_PANEL_COUNT}
-                    nameInSchema={'panels'}
-                    fieldLabel="Panels"
-                    fieldDescription="Add your comic panels here. You can drag and drop files or click to select."
-                /> */}
 
                 <AddComicPanelLayoutMaker />
 
@@ -149,6 +172,7 @@ export default function AddComicForm({
                 />
 
                 <FormTagInput fieldLabel="Tags" nameInSchema="tags" />
+                {/* FIXME: SelectComicSeries hydration error */}
 
                 <SelectComicSeries
                     series={userSeries}
@@ -158,7 +182,6 @@ export default function AddComicForm({
                     fieldDescription="Select a series to add this comic to. If you don't have a series, you can create one."
                 />
 
-                {/* TODO: fetch collections based on selected series */}
                 <SelectComicCollection
                     collections={[
                         {

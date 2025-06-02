@@ -1,4 +1,4 @@
-import { FILE_ACCEPTED_TYPES } from '@/constants'
+import { FILE_ACCEPTED_TYPES } from '@/appConfig'
 import { useRef } from 'react'
 
 type DropdownFileInputProps = {

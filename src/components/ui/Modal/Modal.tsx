@@ -1,4 +1,6 @@
-import React, { MouseEvent } from 'react'
+'use client'
+
+import React, { MouseEvent, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 
 type TriggerWithOnClick = React.ReactElement<{
@@ -30,7 +32,14 @@ export default function Modal({
     usePortal = false,
     children,
 }: ModalProps) {
-    const dialogRef = React.useRef<HTMLDialogElement>(null)
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+    const dialogRef = useRef<HTMLDialogElement>(null)
+
+    if (usePortal && !mounted) return null
 
     const closeModal = () => {
         dialogRef.current?.close()
@@ -68,7 +77,7 @@ export default function Modal({
                 <div className="flex justify-between gap-2">
                     <button
                         type="button"
-                        className="btn btn-outline"
+                        className="btn "
                         onClick={() => {
                             onCancel?.()
                             closeModal()
@@ -100,7 +109,7 @@ export default function Modal({
     return (
         <>
             {enhancedTrigger}
-            {usePortal
+            {usePortal && typeof document !== 'undefined'
                 ? ReactDOM.createPortal(modalContent, document.body)
                 : modalContent}
         </>

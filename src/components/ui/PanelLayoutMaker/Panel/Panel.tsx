@@ -4,10 +4,11 @@ import React, { useEffect } from 'react'
 import type { DraggableSyntheticListeners } from '@dnd-kit/core'
 import type { Transform } from '@dnd-kit/utilities'
 
-import styles from './Item.module.css'
 import clsx from 'clsx'
-import Remove from '@/components/ui/PanelCreator/Panel/Remove'
-import Handle from '@/components/ui/PanelCreator/Panel/Handle'
+import Remove from '@/components/ui/PanelLayoutMaker/Panel/Remove'
+import Handle from '@/components/ui/PanelLayoutMaker/Panel/Handle'
+import { PANEL_BORDER_WIDTHS, PANEL_ROUNDED_VALUE } from '@/appConfig'
+import { TPanelBorderWidth } from '@/types'
 
 export interface Props {
     dragOverlay?: boolean
@@ -24,7 +25,9 @@ export interface Props {
     style?: React.CSSProperties
     transition?: string | null
     wrapperStyle?: React.CSSProperties
-    displayValue: React.ReactNode
+    displayItem: React.ReactNode
+    borderWidth?: TPanelBorderWidth
+    rounded?: boolean
     onRemove?(): void
     renderItem?(args: {
         dragOverlay: boolean
@@ -37,7 +40,7 @@ export interface Props {
         style: React.CSSProperties | undefined
         transform: Props['transform']
         transition: Props['transition']
-        displayValue: Props['displayValue']
+        displayItem: Props['displayItem']
     }): React.ReactElement
 }
 
@@ -45,6 +48,8 @@ export const Panel = React.memo(
     React.forwardRef<HTMLLIElement, Props>(
         (
             {
+                borderWidth,
+                rounded,
                 color,
                 dragOverlay,
                 dragging,
@@ -60,7 +65,7 @@ export const Panel = React.memo(
                 style,
                 transition,
                 transform,
-                displayValue,
+                displayItem,
                 wrapperStyle,
                 ...props
             },
@@ -70,13 +75,20 @@ export const Panel = React.memo(
                 if (!dragOverlay) {
                     return
                 }
-
-                document.body.style.cursor = 'grabbing'
+                if (document) {
+                    document.body.style.cursor = 'grabbing'
+                }
 
                 return () => {
+                    if (document) {
+                        document.body.style.cursor = ''
+                    }
                     document.body.style.cursor = ''
                 }
             }, [dragOverlay])
+
+            console.log('rounded', rounded)
+            console.log('borderWidth', borderWidth)
 
             return renderItem ? (
                 renderItem({
@@ -90,25 +102,22 @@ export const Panel = React.memo(
                     style,
                     transform,
                     transition,
-                    displayValue,
+                    displayItem,
                 })
             ) : (
                 <li
                     className={clsx(
                         // styles.Wrapper,
-                        'flex',
+                        'flex box-border',
                         'origin-top-left',
                         'touch-manipulation',
-                        'transition-transform',
-                        dragOverlay && [
-                            'z-[999]',
-                            'scale-[1.05]',
-                            'shadow-[0_15px_15px_0_rgba(34,33,81,0.25),-1px_0_15px_0_rgba(34,33,81,0.01)]',
-                        ],
+                        'list-none',
+                        dragOverlay && ['z-[999]', 'scale-[1.05]', 'shadow-sm'],
                         fadeIn && 'fade-in',
                         // fadeIn && styles.fadeIn,
-                        sorting && styles.sorting
+                        // sorting && styles.sorting,
                         // dragOverlay && styles.dragOverlay
+                        sorting && 'pop cursor-[inherit] opacity-100'
                     )}
                     style={
                         {
@@ -130,45 +139,64 @@ export const Panel = React.memo(
                                 : undefined,
                             '--index': index,
                             '--color': color,
+                            transform: `translate3d(
+                            ${transform ? `${Math.round(transform.x)}px` : '0'},
+                            ${transform ? `${Math.round(transform.y)}px` : '0'},
+                            0
+                            ) scaleX(${transform?.scaleX ?? 1}) scaleY(${
+                                transform?.scaleY ?? 1
+                            })`,
                         } as React.CSSProperties
                     }
                     ref={ref}
                 >
                     <div
                         className={clsx(
-                            'group relative flex flex-grow items-center list-none origin-center transition-shadow duration-200 ease-[cubic-bezier(0.18,0.67,0.6,1.22)] select-none',
-                            // 'px-5',
-                            // 'py-[18px]',
-                            'bg-base-100',
-                            'shadow-md',
-                            'outline-none',
-                            // 'rounded-[calc(4px/var(--scale-x,1))]',
-                            // 'list-none',
-                            // 'origin-center',
-                            '',
-                            styles.Item,
-                            dragging && styles.dragging,
-                            handle && styles.withHandle,
-                            dragOverlay && styles.dragOverlay,
-                            disabled && styles.disabled,
-                            color && styles.color
+                            'group relative flex flex-grow items-center overflow-hidden border-base-300',
+                            'list-none origin-center transition-shadow duration-200 ease-in select-none',
+                            dragging &&
+                                !dragOverlay &&
+                                'opacity-[var(--dnd-dragging-opacity,0.5)] z-0',
+                            !handle && 'cursor-grab touch-manipulation'
                         )}
-                        style={style}
+                        style={{
+                            ...style,
+                            borderWidth: borderWidth
+                                ? `${PANEL_BORDER_WIDTHS[borderWidth]}px`
+                                : undefined,
+                            borderRadius: rounded
+                                ? `${PANEL_ROUNDED_VALUE}px`
+                                : undefined,
+                        }}
                         data-cypress="draggable-item"
                         {...(!handle ? listeners : undefined)}
                         {...props}
                         tabIndex={!handle ? 0 : undefined}
                     >
-                        {displayValue}
-                        <span className={styles.Actions}>
+                        {displayItem}
+                        <span
+                            className={
+                                'absolute top-0 w-full justify-between flex items-center gap-2 pl-2'
+                            }
+                        >
                             {onRemove ? (
                                 <Remove
-                                    className={'hidden group-hover:block'}
+                                    className={
+                                        'hidden btn group-hover:flex btn-sm btn-square hover:btn-error '
+                                    }
                                     onClick={onRemove}
                                 />
                             ) : null}
                             {handle ? (
-                                <Handle {...handleProps} {...listeners} />
+                                <Handle
+                                    {...handleProps}
+                                    {...listeners}
+                                    className={`p-2 ml-auto ${
+                                        disabled &&
+                                        'hidden group-hover:flex shadow-2xl'
+                                    }`}
+                                    // cursor={disabled && 'not-allowed' }
+                                />
                             ) : null}
                         </span>
                     </div>
