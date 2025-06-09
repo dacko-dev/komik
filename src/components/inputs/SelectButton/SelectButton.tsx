@@ -1,3 +1,4 @@
+import Tooltip from '@/components/ui/Tooltip/Tooltip'
 import { ChevronDown } from 'lucide-react'
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 
@@ -5,6 +6,7 @@ type Option<T> = { value: T; label: string }
 
 type SelectButtonProps<T extends string | number = string | number> = {
     label: string | React.ReactNode
+    tooltip?: string
     options: Option<T>[]
     value: T | null
     onChange: (value: T) => void
@@ -12,12 +14,14 @@ type SelectButtonProps<T extends string | number = string | number> = {
     disabled?: boolean
     className?: string
     labelClassName?: string
+    wrapperClassName?: string
 }
 
 export default function SelectButton<
     T extends string | number = string | number
 >({
     label,
+    tooltip,
     options,
     value,
     onChange,
@@ -25,6 +29,7 @@ export default function SelectButton<
     disabled = false,
     className = '',
     labelClassName = '',
+    wrapperClassName = '',
 }: SelectButtonProps) {
     const id = useId()
     const buttonRef = useRef<HTMLButtonElement>(null)
@@ -107,39 +112,41 @@ export default function SelectButton<
     }, [open])
 
     return (
-        <div ref={wrapperRef} className="relative">
-            <button
-                ref={buttonRef}
-                id={id}
-                type="button"
-                disabled={disabled}
-                aria-haspopup="listbox"
-                aria-expanded={open}
-                aria-labelledby={`${id}-label`}
-                aria-controls={`${id}-listbox`}
-                onClick={toggleOpen}
-                onKeyDown={handleKeyDown}
-                className={`btn flex justify-between items-center p-0 gap-0 ${className}`}
-            >
-                <label
-                    htmlFor={id}
-                    id={`${id}-label`}
-                    className={`flex items-center font-light text-sm border-r-2 self-stretch border-base-300 cursor-pointer p-2 ${labelClassName}`}
+        <div ref={wrapperRef} className={`relative ${wrapperClassName}`}>
+            <Tooltip tooltip={tooltip}>
+                <button
+                    ref={buttonRef}
+                    id={id}
+                    type="button"
+                    disabled={disabled}
+                    aria-haspopup="listbox"
+                    aria-expanded={open}
+                    aria-labelledby={`${id}-label`}
+                    aria-controls={`${id}-listbox`}
+                    onClick={toggleOpen}
+                    onKeyDown={handleKeyDown}
+                    className={`btn flex justify-between items-center w-full p-0 gap-0 ${className}`}
                 >
-                    {label}
-                </label>
-                <div className="flex whitespace-nowrap text-sm px-2 items-center">
-                    <span>{selectedLabel}</span>
-                </div>
-                <div className="pr-2">
-                    <ChevronDown
-                        className={` h-5 w-5 transition-transform ${
-                            open ? 'rotate-180' : ''
-                        }`}
-                        aria-hidden="true"
-                    />
-                </div>
-            </button>
+                    <label
+                        htmlFor={id}
+                        id={`${id}-label`}
+                        className={`grow-0 flex items-center font-light text-sm border-r-2 self-stretch border-base-300 cursor-pointer p-2 ${labelClassName}`}
+                    >
+                        {label}
+                    </label>
+                    <div className="flex grow whitespace-nowrap text-sm px-2 items-center justify-center w-full">
+                        <span>{selectedLabel}</span>
+                    </div>
+                    <div className="pr-2">
+                        <ChevronDown
+                            className={` h-5 w-5 transition-transform ${
+                                open ? 'rotate-180' : ''
+                            }`}
+                            aria-hidden="true"
+                        />
+                    </div>
+                </button>
+            </Tooltip>
 
             {open && (
                 <ul

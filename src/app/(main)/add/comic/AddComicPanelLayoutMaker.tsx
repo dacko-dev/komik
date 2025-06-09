@@ -10,16 +10,18 @@ import { PanelLayoutMaker } from '@/components/ui/PanelLayoutMaker/PanelLayoutMa
 
 import {
     FILE_ACCEPTED_TYPES,
+    MAX_BORDER_WIDTH,
+    MAX_GAP_SIZE,
     MAX_PANEL_COLUMNS,
-    PANEL_BORDER_WIDTHS,
-    PANEL_GAPS,
 } from '@/appConfig'
 import { bestColumnsNumber } from '@/lib/app'
 import { fileSchema } from '@/lib/schemas/appLogicSchema'
 import {
     BetweenHorizontalStartIcon,
     BetweenVerticalEndIcon,
+    BookOpenText,
     Columns2Icon,
+    EyeIcon,
     ImagesIcon,
     PaintRollerIcon,
     PlusIcon,
@@ -33,7 +35,9 @@ import BorderIcon from '@/components/icons/BorderIcon'
 import CheckboxButton from '@/components/inputs/CheckboxButton/CheckboxButton'
 import RoundedIcon from '@/components/icons/RoundedIcon'
 import ColorInputButton from '@/components/inputs/ColorInputButton/ColorInputButton'
-import { TPanelBorderWidth, TPanelGaps } from '@/types'
+import InputButton from '@/components/inputs/TextInputButton/TextInputButton'
+import { TReadingMode } from '@/types'
+import { readingModeSchema } from '@/db/schema'
 
 export default function AddComicPanelLayoutMaker() {
     const form = useFormContext<TAddComicForm>()
@@ -43,8 +47,8 @@ export default function AddComicPanelLayoutMaker() {
     const [isDragging, setIsDragging] = useState(false)
     const columns = form.watch('panelLayoutColumns')
     const borderWidth = form.watch('panelLayoutBorderWidth')
-    const gapX = form.watch('panelLayoutGapX')
-    const gapY = form.watch('panelLayoutGapY')
+    const gapRow = form.watch('panelLayoutGapRow')
+    const gapCol = form.watch('panelLayoutGapCol')
     const rounded = form.watch('panelLayoutRounded')
     const backgroundColor = form.watch('panelLayoutBackgroundColor')
     const readingMode = form.watch('panelLayoutReadingMode')
@@ -160,6 +164,7 @@ export default function AddComicPanelLayoutMaker() {
                         <div className="border-b border-base-300 w-full flex items-center gap-4 justify-between p-2">
                             <div className="flex items-center gap-2 flex-wrap">
                                 <SelectButton
+                                    tooltip="Columns"
                                     value={columns}
                                     onChange={(col) =>
                                         handleColumnsChange(
@@ -169,6 +174,7 @@ export default function AddComicPanelLayoutMaker() {
                                         )
                                     }
                                     className="btn-sm"
+                                    labelClassName="grow"
                                     label={<Columns2Icon className="w-4 h-4" />}
                                     options={Array.from(
                                         { length: MAX_PANEL_COLUMNS },
@@ -178,65 +184,62 @@ export default function AddComicPanelLayoutMaker() {
                                         })
                                     )}
                                 />
-                                <SelectButton<TPanelBorderWidth>
-                                    value={borderWidth}
-                                    onChange={(value) => {
-                                        form.setValue(
-                                            'panelLayoutBorderWidth',
-                                            value as TPanelBorderWidth
-                                        )
-                                    }}
-                                    className="btn-sm"
+
+                                <InputButton
+                                    tooltip="Border Width"
+                                    type="number"
                                     label={<BorderIcon className="w-4 h-4" />}
-                                    options={Object.entries(
-                                        PANEL_BORDER_WIDTHS
-                                    ).map(([key]) => ({
-                                        label: key,
-                                        value: key,
-                                    }))}
+                                    aria-label="Panel Border Width"
+                                    min={0}
+                                    max={MAX_BORDER_WIDTH}
+                                    className="max-w-12"
+                                    {...form.register('panelLayoutBorderWidth')}
+                                    onChange={(e) => {
+                                        const value = parseInt(
+                                            e.target.value,
+                                            10
+                                        )
+                                        if (value < 0) {
+                                            e.target.value = String(0)
+                                        } else if (value > MAX_BORDER_WIDTH) {
+                                            e.target.value =
+                                                String(MAX_BORDER_WIDTH)
+                                        }
+
+                                        form.register(
+                                            'panelLayoutBorderWidth'
+                                        ).onChange(e)
+                                    }}
                                 />
 
-                                <SelectButton<TPanelGaps>
-                                    value={gapX}
-                                    onChange={(gap) =>
-                                        form.setValue(
-                                            'panelLayoutGapX',
-                                            gap as TPanelGaps
-                                        )
-                                    }
-                                    className="btn-sm"
+                                <InputButton
+                                    tooltip="Column Gap"
+                                    type="number"
                                     label={
                                         <BetweenVerticalEndIcon className="w-4 h-4" />
                                     }
-                                    options={Object.entries(PANEL_GAPS).map(
-                                        ([key]) => ({
-                                            label: key,
-                                            value: key,
-                                        })
-                                    )}
+                                    aria-label="Panel Column Gap"
+                                    min={0}
+                                    max={MAX_GAP_SIZE}
+                                    className="max-w-12"
+                                    {...form.register('panelLayoutGapCol')}
                                 />
 
-                                <SelectButton<TPanelGaps>
-                                    value={gapY}
-                                    onChange={(gap) =>
-                                        form.setValue(
-                                            'panelLayoutGapY',
-                                            gap as TPanelGaps
-                                        )
-                                    }
-                                    className="btn-sm"
+                                <InputButton
+                                    tooltip="Row Gap"
+                                    type="number"
+                                    className="max-w-12"
                                     label={
                                         <BetweenHorizontalStartIcon className="w-4 h-4" />
                                     }
-                                    options={Object.entries(PANEL_GAPS).map(
-                                        ([key]) => ({
-                                            label: key,
-                                            value: key,
-                                        })
-                                    )}
+                                    aria-label="Panel Row Gap"
+                                    min={0}
+                                    max={MAX_GAP_SIZE}
+                                    {...form.register('panelLayoutGapRow')}
                                 />
 
                                 <CheckboxButton
+                                    tooltip="Rounded Corners"
                                     onChange={(e) => {
                                         if (e.target.checked) {
                                             form.setValue(
@@ -258,6 +261,7 @@ export default function AddComicPanelLayoutMaker() {
                                 />
 
                                 <ColorInputButton
+                                    tooltip="Background Color"
                                     value={backgroundColor}
                                     onChange={(e) => {
                                         form.setValue(
@@ -272,6 +276,30 @@ export default function AddComicPanelLayoutMaker() {
                                     name="panelLayoutBackgroundColor"
                                     aria-label="Panel Background Color"
                                 />
+
+                                <SelectButton
+                                    tooltip="Reading Mode"
+                                    value={readingMode}
+                                    onChange={(val) =>
+                                        form.setValue(
+                                            'panelLayoutReadingMode',
+                                            val as TReadingMode
+                                        )
+                                    }
+                                    className="btn-sm"
+                                    label={<BookOpenText className="w-4 h-4" />}
+                                    options={readingModeSchema.options.map(
+                                        (option) => ({
+                                            value: option,
+                                            label:
+                                                option === 'leftToRight'
+                                                    ? 'Left to Right'
+                                                    : option === 'rightToLeft'
+                                                    ? 'Right to Left'
+                                                    : 'Other',
+                                        })
+                                    )}
+                                />
                             </div>
                         </div>
 
@@ -281,8 +309,8 @@ export default function AddComicPanelLayoutMaker() {
                             setItems={setPanels}
                             columns={columns}
                             borderWidth={borderWidth}
-                            gapX={gapX}
-                            gapY={gapY}
+                            gapRow={gapRow}
+                            gapCol={gapCol}
                             readingMode={readingMode}
                             rounded={rounded}
                             backgroundColor={backgroundColor}
@@ -309,7 +337,7 @@ export default function AddComicPanelLayoutMaker() {
                             <div className="flex items-center justify-between w-full">
                                 <button
                                     type="button"
-                                    className="btn btn-sm  btn-soft hover:btn-error "
+                                    className="btn btn-sm btn-soft hover:btn-error "
                                     onClick={() => {
                                         setPanels([])
                                         form.setValue('panels', [])
@@ -322,16 +350,26 @@ export default function AddComicPanelLayoutMaker() {
                                     <TrashIcon size={16} />
                                 </button>
 
-                                <button
-                                    type="button"
-                                    className="btn btn-sm btn-secondary "
-                                    onClick={() => {
-                                        inputRef.current?.click()
-                                    }}
-                                >
-                                    Add Panels
-                                    <PlusIcon size={16} />
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm "
+                                    >
+                                        Preview
+                                        <EyeIcon size={16} />
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-secondary "
+                                        onClick={() => {
+                                            inputRef.current?.click()
+                                        }}
+                                    >
+                                        Add Panels
+                                        <PlusIcon size={16} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </>

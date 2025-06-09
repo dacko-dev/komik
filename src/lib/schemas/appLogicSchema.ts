@@ -16,5 +16,20 @@ export const colorSchema = z.string().refine((color) => {
     return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(color)
 }, 'Invalid color format. Use hex format (e.g., #RRGGBB or #RGB)')
 
-export type TFileSchema = z.infer<typeof fileSchema>
-export type TColorSchema = z.infer<typeof colorSchema>
+export const pixelsOptionSchema = ({
+    min = 0,
+    max = 100,
+}: {
+    min?: number
+    max?: number
+} = {}) =>
+    z
+        .number()
+        .int()
+        .min(min, `Value must be at least ${min}px`)
+        .max(max, `Value must be at most ${max}px`)
+
+// z
+//     .number()
+//     .int()
+//     .min(0, 'Value must be a positive integer')

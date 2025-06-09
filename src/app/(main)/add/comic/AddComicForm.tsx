@@ -3,7 +3,11 @@
 import { FormInputWithLabel } from '@/components/inputs/FormInputWithLabel/FormInputWithLabel'
 import { FormSelect } from '@/components/inputs/FormSelect/FormSelect'
 import { FormTextareaWithLabel } from '@/components/inputs/FormTextareaWithLabel/FormTextareaWithLabel'
-import { colorSchema, fileSchema } from '@/lib/schemas/appLogicSchema'
+import {
+    colorSchema,
+    fileSchema,
+    pixelsOptionSchema,
+} from '@/lib/schemas/appLogicSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -13,6 +17,7 @@ import {
     comicOptionsConfig,
     comicOptionsDefaults,
     contentVisibilitySchema,
+    readingModeSchema,
 } from '@/db/schema'
 import { stringToZodType } from '@/lib/utils'
 import FormFieldBox from '@/components/inputs/FormFieldBox/FormFieldBox'
@@ -21,20 +26,14 @@ import FormTagInput from '@/components/inputs/FormTagInput/FormTagInput'
 import SelectComicSeries from '@/app/(main)/add/comic/SelectComicSeries'
 import FormComboboxWithLabel from '@/components/inputs/FormComboboxWithLabel/FormComboboxWithLabel'
 import SelectComicCollection from '@/app/(main)/add/comic/SelectComicCollection'
-import {
-    TGenre,
-    TLanguage,
-    TPanelBorderWidth,
-    TPanelGaps,
-    TSeries,
-} from '@/types'
+import { TGenre, TLanguage, TSeries } from '@/types'
 import AddComicPanelLayoutMaker from '@/app/(main)/add/comic/AddComicPanelLayoutMaker'
 import {
+    APP_DEFAULTS,
+    MAX_BORDER_WIDTH,
+    MAX_GAP_SIZE,
     MAX_PANEL_COUNT,
     MIN_PANEL_COUNT,
-    PANEL_BORDER_WIDTHS,
-    PANEL_GAPS,
-    PANEL_READING_MODES,
 } from '@/appConfig'
 
 const AddComicPanelSchema = z.object({
@@ -56,14 +55,12 @@ const AddComicSchema = z.object({
 
     visibility: contentVisibilitySchema,
     panelLayoutColumns: z.number(),
-    panelLayoutBorderWidth: z.enum(
-        Object.keys(PANEL_BORDER_WIDTHS) as [TPanelBorderWidth]
-    ),
+    panelLayoutBorderWidth: pixelsOptionSchema({ max: MAX_BORDER_WIDTH }),
     panelLayoutRounded: z.boolean(),
-    panelLayoutGapX: z.enum(Object.keys(PANEL_GAPS) as [TPanelGaps]),
-    panelLayoutGapY: z.enum(Object.keys(PANEL_GAPS) as [TPanelGaps]),
+    panelLayoutGapRow: pixelsOptionSchema({ max: MAX_GAP_SIZE }),
+    panelLayoutGapCol: pixelsOptionSchema({ max: MAX_GAP_SIZE }),
     panelLayoutBackgroundColor: colorSchema.optional(),
-    panelLayoutReadingMode: z.enum(PANEL_READING_MODES),
+    panelLayoutReadingMode: readingModeSchema,
     panels: z
         .array(AddComicPanelSchema)
         .min(MIN_PANEL_COUNT, `At least ${MIN_PANEL_COUNT} panel is required`)
@@ -110,12 +107,12 @@ export default function AddComicForm({
             panels: [],
             panelLayoutBackgroundColor: '#ffffff',
             visibility: 'public',
-            panelLayoutColumns: 1,
-            panelLayoutBorderWidth: 'None',
-            panelLayoutRounded: false,
-            panelLayoutGapX: 'None',
-            panelLayoutGapY: 'None',
-            panelLayoutReadingMode: 'ltr',
+            panelLayoutColumns: APP_DEFAULTS.panelColumns,
+            panelLayoutBorderWidth: APP_DEFAULTS.borderWidth,
+            panelLayoutRounded: APP_DEFAULTS.isRounded,
+            panelLayoutGapRow: APP_DEFAULTS.gapRow,
+            panelLayoutGapCol: APP_DEFAULTS.gapCol,
+            panelLayoutReadingMode: APP_DEFAULTS.readingMode,
             options: comicOptionsDefaults,
         },
         shouldFocusError: true,

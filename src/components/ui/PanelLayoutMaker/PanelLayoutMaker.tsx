@@ -35,11 +35,13 @@ import {
 } from '@dnd-kit/sortable'
 import Wrapper from '@/components/ui/PanelLayoutMaker/Wrapper'
 import { Panel } from '@/components/ui/PanelLayoutMaker/Panel/Panel'
-import { PlusIcon } from 'lucide-react'
-import { PANEL_ROUNDED_VALUE } from '@/appConfig'
 import PanelGrid from '@/components/ui/PanelLayoutMaker/PanelGrid'
-import { TColorSchema } from '@/lib/schemas/appLogicSchema'
-import { TPanelBorderWidth, TPanelGaps, TPanelReadingMode } from '@/types'
+import {
+    TColorSchema,
+    TPanelBorderWidth,
+    TPanelGap,
+    TReadingMode,
+} from '@/types'
 
 export interface Props<T> {
     activationConstraint?: PointerActivationConstraint
@@ -52,14 +54,13 @@ export interface Props<T> {
     handle?: boolean
     items: T[]
     setItems: React.Dispatch<React.SetStateAction<T[]>>
-    onNewPanelButtonClick?: () => void
     columns?: number
     borderWidth?: TPanelBorderWidth
-    gapX?: TPanelGaps
-    gapY?: TPanelGaps
+    gapRow?: TPanelGap
+    gapCol?: TPanelGap
     rounded?: boolean
     backgroundColor?: TColorSchema
-    readingMode?: TPanelReadingMode
+    readingMode?: TReadingMode
     getItemId: (item: T) => UniqueIdentifier
     displayItem?: (item: T) => React.ReactNode
     measuring?: MeasuringConfiguration
@@ -118,11 +119,10 @@ export function PanelLayoutMaker<T>({
     handle = false,
     items = [],
     setItems,
-    onNewPanelButtonClick,
     columns,
     borderWidth,
-    gapX,
-    gapY,
+    gapRow,
+    gapCol,
     readingMode,
     rounded,
     backgroundColor,
@@ -266,8 +266,8 @@ export function PanelLayoutMaker<T>({
                 >
                     <PanelGrid
                         backgroundColor={backgroundColor}
-                        gapX={gapX}
-                        gapY={gapY}
+                        gapRow={gapRow}
+                        gapCol={gapCol}
                         readingMode={readingMode}
                         columns={columns}
                     >
@@ -292,7 +292,7 @@ export function PanelLayoutMaker<T>({
                                 getNewIndex={getNewIndex}
                             />
                         ))}
-                        {isLayoutUneven && (
+                        {/* {isLayoutUneven && (
                             <button
                                 type="button"
                                 className={`flex btn border-0 items-center justify-center w-full h-full p-2 bg-base-200`}
@@ -307,7 +307,7 @@ export function PanelLayoutMaker<T>({
                             >
                                 <PlusIcon />
                             </button>
-                        )}
+                        )} */}
                     </PanelGrid>
                 </SortableContext>
             </Wrapper>

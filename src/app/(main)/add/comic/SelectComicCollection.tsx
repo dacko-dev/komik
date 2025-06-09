@@ -44,7 +44,7 @@ export default function SelectComicCollection<S>({
                     <FormFieldLabel
                         className={labelClassName}
                         fieldLabel={
-                            <p className="flex items-center gap-2">
+                            <p className="flex items-center gap-2 mb-1">
                                 {fieldLabel}
                                 <Modal
                                     usePortal={true}

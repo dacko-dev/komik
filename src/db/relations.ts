@@ -17,6 +17,8 @@ import {
 } from './schema'
 import { authUsers } from 'drizzle-orm/supabase'
 
+// https://orm.drizzle.team/docs/relations
+
 export const reactionsRelations = relations(reactions, ({ one }) => ({
     comic: one(comics, {
         fields: [reactions.comicId],

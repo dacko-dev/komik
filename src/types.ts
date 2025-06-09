@@ -1,17 +1,19 @@
 import {
-    PANEL_BORDER_WIDTHS,
-    PANEL_GAPS,
-    PANEL_READING_MODES,
-} from '@/appConfig'
-import {
     comicLayoutSchema,
     comicOptionsConfig,
+    contentVisibilitySchema,
     genresSelectSchema,
     languagesSelectSchema,
     panelInfoSchema,
+    readingModeSchema,
     seriesSelectSchema,
     tagsSelectSchema,
 } from '@/db/schema'
+import {
+    colorSchema,
+    fileSchema,
+    pixelsOptionSchema,
+} from '@/lib/schemas/appLogicSchema'
 import {
     InputHTMLAttributes,
     SelectHTMLAttributes,
@@ -125,6 +127,11 @@ export type TPanelInfo = z.infer<typeof panelInfoSchema>
 
 export type TComicLayout = z.infer<typeof comicLayoutSchema>
 
-export type TPanelBorderWidth = keyof typeof PANEL_BORDER_WIDTHS
-export type TPanelGaps = keyof typeof PANEL_GAPS
-export type TPanelReadingMode = (typeof PANEL_READING_MODES)[number]
+type TPixelSchema = z.infer<ReturnType<typeof pixelsOptionSchema>>
+
+export type TPanelBorderWidth = TPixelSchema
+export type TPanelGap = TPixelSchema
+export type TContentVisibility = z.infer<typeof contentVisibilitySchema>
+export type TFileSchema = z.infer<typeof fileSchema>
+export type TColorSchema = z.infer<typeof colorSchema>
+export type TReadingMode = z.infer<typeof readingModeSchema>

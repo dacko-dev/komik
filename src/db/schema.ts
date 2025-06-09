@@ -13,6 +13,7 @@ import {
     primaryKey,
     pgEnum,
     jsonb,
+    smallint,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { authenticatedRole, authUsers } from 'drizzle-orm/supabase'
@@ -29,6 +30,14 @@ export const contentVisibility = pgEnum('content_visibility', [
 ])
 
 export const contentVisibilitySchema = createSelectSchema(contentVisibility)
+
+// TODO: update in appConfig and components
+export const readingMode = pgEnum('reading_mode', [
+    'leftToRight',
+    'rightToLeft',
+])
+
+export const readingModeSchema = createSelectSchema(readingMode)
 
 export const reactionType = pgEnum('reaction_type', [
     'like',
@@ -297,16 +306,24 @@ export const comics = pgTable(
             .notNull(),
         title: text().notNull(),
         description: text(),
+        visibility: contentVisibility('visibility').default('public'),
         seriesId: text('series_id'),
         collectionId: uuid('collection_id'),
-        language: text('language').notNull(),
-        layout: comicLayout('panel_layout').default('grid'),
-        panelCount: integer('panel_count').notNull(),
-        rows: integer('rows').notNull(),
-        columns: integer('columns').notNull(),
-        visibility: contentVisibility('visibility').default('public'),
-        // disableComments: boolean('disable_comments').default(false),
-        // drawOver: boolean('draw_over').default(false),
+        language: text('language_id').notNull(),
+        panelCount: smallint('panel_count'),
+        columns: smallint('columns').notNull(),
+        borderWidth: smallint('border_width'),
+        roundedCorners: boolean('rounded_corners'),
+        gapRow: smallint('gap_row')
+            .notNull()
+            .default(sql`'0'`),
+        gapCol: smallint('gap_row')
+            .notNull()
+            .default(sql`'0'`),
+        backgroundColor: text('background_color')
+            .default(sql`'#ffffff'`)
+            .notNull(),
+        readingMode: readingMode('reading_mode').default('leftToRight'),
         options: jsonb('options')
             .$type<TComicOptions>()
             .notNull()
@@ -352,8 +369,8 @@ export const comics = pgTable(
             .onDelete('set null'),
         foreignKey({
             columns: [table.language],
-            foreignColumns: [languages.code],
-            name: 'comics_language_code_fkey',
+            foreignColumns: [languages.id],
+            name: 'comics_language_id_fkey',
         })
             .onUpdate('cascade')
             .onDelete('restrict'),

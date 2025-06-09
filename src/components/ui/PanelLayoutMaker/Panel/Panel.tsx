@@ -7,7 +7,7 @@ import type { Transform } from '@dnd-kit/utilities'
 import clsx from 'clsx'
 import Remove from '@/components/ui/PanelLayoutMaker/Panel/Remove'
 import Handle from '@/components/ui/PanelLayoutMaker/Panel/Handle'
-import { PANEL_BORDER_WIDTHS, PANEL_ROUNDED_VALUE } from '@/appConfig'
+import { PANEL_ROUNDED_VALUE } from '@/appConfig'
 import { TPanelBorderWidth } from '@/types'
 
 export interface Props {
@@ -162,7 +162,7 @@ export const Panel = React.memo(
                         style={{
                             ...style,
                             borderWidth: borderWidth
-                                ? `${PANEL_BORDER_WIDTHS[borderWidth]}px`
+                                ? `${borderWidth}px`
                                 : undefined,
                             borderRadius: rounded
                                 ? `${PANEL_ROUNDED_VALUE}px`
@@ -174,9 +174,12 @@ export const Panel = React.memo(
                         tabIndex={!handle ? 0 : undefined}
                     >
                         {displayItem}
-                        <span
+                        <div
+                            style={{
+                                direction: 'ltr', // Ensure handle and remove display correctly
+                            }}
                             className={
-                                'absolute top-0 w-full justify-between flex items-center gap-2 pl-2'
+                                'absolute  top-0 w-full justify-between flex items-center gap-2 pl-2'
                             }
                         >
                             {onRemove ? (
@@ -198,7 +201,7 @@ export const Panel = React.memo(
                                     // cursor={disabled && 'not-allowed' }
                                 />
                             ) : null}
-                        </span>
+                        </div>
                     </div>
                 </li>
             )

@@ -1,14 +1,12 @@
-import { PANEL_GAPS } from '@/appConfig'
-import { TColorSchema } from '@/lib/schemas/appLogicSchema'
-import { TPanelGaps, TPanelReadingMode } from '@/types'
+import { TColorSchema, TPanelGap, TReadingMode } from '@/types'
 import clsx from 'clsx'
 
 export interface Props {
     children: React.ReactNode
     columns?: number
-    gapX?: TPanelGaps
-    gapY?: TPanelGaps
-    readingMode?: TPanelReadingMode
+    gapRow?: TPanelGap
+    gapCol?: TPanelGap
+    readingMode?: TReadingMode
     backgroundColor?: TColorSchema
     style?: React.CSSProperties
     className?: string
@@ -17,8 +15,8 @@ export interface Props {
 export default function PanelGrid({
     children,
     columns = 1,
-    gapX,
-    gapY,
+    gapRow,
+    gapCol,
     readingMode,
     backgroundColor,
     style,
@@ -34,19 +32,17 @@ export default function PanelGrid({
             style={
                 {
                     backgroundColor: backgroundColor,
-                    gap: `${gapY && PANEL_GAPS[gapY]} ${
-                        gapX && PANEL_GAPS[gapX]
-                    }`,
+                    gap: `${gapRow ? gapRow : 0}px ${gapCol ? gapCol : 0}px`,
                     gridTemplateColumns:
                         columns > 1
                             ? `repeat(${columns}, minmax(0, 1fr))`
                             : undefined,
-                    justifyContent:
-                        readingMode === 'ltr'
-                            ? 'start'
-                            : readingMode === 'rtl'
-                            ? 'end'
-                            : 'normal',
+                    direction:
+                        readingMode === 'leftToRight'
+                            ? 'ltr'
+                            : readingMode === 'rightToLeft'
+                            ? 'rtl'
+                            : 'inherit',
 
                     ...style,
                 } as React.CSSProperties
