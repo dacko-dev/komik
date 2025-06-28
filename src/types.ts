@@ -4,7 +4,6 @@ import {
     contentVisibilitySchema,
     genresSelectSchema,
     languagesSelectSchema,
-    panelInfoSchema,
     readingModeSchema,
     seriesSelectSchema,
     tagsSelectSchema,
@@ -123,7 +122,7 @@ export type TComicOptions = {
     [K in keyof TOptionConfig]: InferOptionValue<TOptionConfig[K]>
 }
 
-export type TPanelInfo = z.infer<typeof panelInfoSchema>
+// export type TPanelInfo = z.infer<typeof panelInfoSchema>
 
 export type TComicLayout = z.infer<typeof comicLayoutSchema>
 

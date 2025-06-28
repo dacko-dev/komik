@@ -18,9 +18,10 @@ import {
 import { sql } from 'drizzle-orm'
 import { authenticatedRole, authUsers } from 'drizzle-orm/supabase'
 import { createSelectSchema } from 'drizzle-zod'
-import { TComicOptions, TPanelInfo } from '@/types'
-import { z } from 'zod'
-import { MAX_PANEL_COLUMNS, MAX_PANEL_COUNT, MAX_PANEL_ROWS } from '@/appConfig'
+import { TComicOptions } from '@/types'
+import { MAX_PANEL_COLUMNS, MAX_PANEL_COUNT } from '@/appConfig'
+
+// TODO: add npx drizzle-kit push to  GitHub Actions
 
 // ENUMS & VALUES
 export const contentVisibility = pgEnum('content_visibility', [
@@ -31,7 +32,6 @@ export const contentVisibility = pgEnum('content_visibility', [
 
 export const contentVisibilitySchema = createSelectSchema(contentVisibility)
 
-// TODO: update in appConfig and components
 export const readingMode = pgEnum('reading_mode', [
     'leftToRight',
     'rightToLeft',
@@ -90,7 +90,7 @@ export const reactions = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
     },
     (table) => [
@@ -120,12 +120,12 @@ export const reactions = pgTable(
 export const profiles = pgTable(
     'profiles',
     {
-        id: uuid().defaultRandom().primaryKey().notNull(),
+        id: uuid().primaryKey().notNull(),
         createdAt: timestamp('created_at', {
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         username: text().notNull(),
         avatar: text(),
@@ -190,7 +190,7 @@ export const seriesBookmarks = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         seriesId: uuid('series_id'),
         userId: uuid('user_id')
@@ -229,13 +229,13 @@ export const collections = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         updatedAt: timestamp('updated_at', {
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         name: text().notNull(),
         slug: text().notNull(),
@@ -296,20 +296,20 @@ export const comics = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         updatedAt: timestamp('updated_at', {
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         title: text().notNull(),
         description: text(),
         visibility: contentVisibility('visibility').default('public'),
         seriesId: text('series_id'),
         collectionId: uuid('collection_id'),
-        language: text('language_id').notNull(),
+        languageId: text('language_id').notNull(),
         panelCount: smallint('panel_count'),
         columns: smallint('columns').notNull(),
         borderWidth: smallint('border_width'),
@@ -368,7 +368,7 @@ export const comics = pgTable(
             .onUpdate('cascade')
             .onDelete('set null'),
         foreignKey({
-            columns: [table.language],
+            columns: [table.languageId],
             foreignColumns: [languages.id],
             name: 'comics_language_id_fkey',
         })
@@ -405,38 +405,36 @@ export const comics = pgTable(
         check('comics_title_check', sql`length(title) < 50`),
         check('comics_total_reactions_check', sql`total_reactions >= 0`),
         check('comics_total_views_check', sql`total_views >= 0`),
-        check('comics_panel_count_check', sql`panel_count > 0`),
-        check('comics_panel_rows_check', sql`panel_rows > 0`),
-        check('comics_panel_columns_check', sql`panel_columns > 0`),
-        check('comics_panel_rows_check', sql`panel_rows <= ${MAX_PANEL_ROWS}`),
+        check('comics_panel_count_min_check', sql`panel_count > 0`),
+        check('comics_panel_columns_min_check', sql`panel_columns > 0`),
         check(
-            'comics_panel_columns_check',
+            'comics_panel_columns_max_check',
             sql`panel_columns <= ${MAX_PANEL_COLUMNS}`
         ),
         check(
-            'comics_panel_count_check',
+            'comics_panel_count_max_check',
             sql`panel_count <= ${MAX_PANEL_COUNT}`
         ),
     ]
 )
 
-export const panelInfoSchema = z.object({
-    x: z.number(),
-    y: z.number(),
-    width: z.number(),
-    height: z.number(),
-    rotation: z.number(),
-    zIndex: z.number(),
-})
+// export const panelInfoSchema = z.object({
+//     x: z.number(),
+//     y: z.number(),
+//     width: z.number(),
+//     height: z.number(),
+//     rotation: z.number(),
+//     zIndex: z.number(),
+// })
 
-const panelInfoDefault = {
-    x: 0,
-    y: 0,
-    width: 100,
-    height: 100,
-    rotation: 0,
-    zIndex: 0,
-}
+// const panelInfoDefault = {
+//     x: 0,
+//     y: 0,
+//     width: 100,
+//     height: 100,
+//     rotation: 0,
+//     zIndex: 0,
+// }
 
 export const panels = pgTable(
     'panels',
@@ -445,21 +443,21 @@ export const panels = pgTable(
         comicId: uuid('comic_id'), // panel is not required to be in a comic
         image: text().notNull(),
         order: integer('order').notNull(),
-        info: jsonb('info')
-            .$type<TPanelInfo>()
-            .notNull()
-            .default(sql` ${JSON.stringify(panelInfoDefault)}`),
+        // info: jsonb('info')
+        //     .$type<TPanelInfo>()
+        //     .notNull()
+        //     .default(sql` ${JSON.stringify(panelInfoDefault)}`),
         createdAt: timestamp('created_at', {
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         updatedAt: timestamp('updated_at', {
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         userId: uuid('user_id')
             .default(sql`auth.uid()`)
@@ -510,7 +508,7 @@ export const comicComments = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         userId: uuid('user_id')
             .default(sql`auth.uid()`)
@@ -523,7 +521,7 @@ export const comicComments = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         lastEditedAt: timestamp('last_edited_at', {
             withTimezone: true,
@@ -582,13 +580,13 @@ export const series = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         updatetAt: timestamp('updatet_at', {
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         id: uuid().defaultRandom().primaryKey().notNull(),
         slug: text().notNull(),
@@ -638,7 +636,7 @@ export const comicCommentHistory = pgTable(
         commentId: uuid('comment_id').defaultRandom().notNull(),
         previousContent: text('previous_content').notNull(),
         editedAt: timestamp('edited_at', { withTimezone: true, mode: 'string' })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
     },
     () => [
@@ -659,7 +657,7 @@ export const comicBookmarks = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         comicId: uuid('comic_id').notNull(),
         userId: uuid('user_id')
@@ -716,7 +714,7 @@ export const notifications = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
     },
     (table) => [
@@ -744,7 +742,7 @@ export const tags = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         slug: text().notNull(),
         name: text().notNull(),
@@ -776,7 +774,7 @@ export const reports = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         comicId: uuid('comic_id').defaultRandom(),
         userId: uuid('user_id'),
@@ -822,13 +820,13 @@ export const genres = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         updatedAt: timestamp('updated_at', {
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
         name: text().notNull(),
         description: text(),
@@ -927,7 +925,7 @@ export const comicPanelCount = pgTable(
             withTimezone: true,
             mode: 'string',
         })
-            .default(sql`(now() AT TIME ZONE 'utc'::text)`)
+            .defaultNow()
             .notNull(),
     },
     () => [

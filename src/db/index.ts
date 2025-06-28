@@ -1,10 +1,10 @@
-import { config } from 'dotenv'
+import { setupEnv } from '@/lib/setupEnv'
 import 'dotenv/config'
 
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
-config({ path: '.env' }) // or .env.local
+setupEnv()
 
 const connectionString = process.env.DATABASE_URL
 if (!connectionString) {
@@ -12,5 +12,11 @@ if (!connectionString) {
 }
 
 // Disable prefetch as it is not supported for "Transaction" pool mode
-export const client = postgres(connectionString, { prepare: false })
+const client = postgres(connectionString, { prepare: false })
 export const db = drizzle(client)
+
+function main() {
+    console.log('Database connection established successfully.')
+}
+
+main()

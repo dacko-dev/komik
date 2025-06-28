@@ -7,9 +7,8 @@ export const FILE_ACCEPTED_TYPES = [
     'image/gif',
 ] as const
 
-export const MAX_PANEL_ROWS = 4 as const
 export const MAX_PANEL_COLUMNS = 4 as const
-export const MAX_PANEL_COUNT = MAX_PANEL_ROWS * MAX_PANEL_COLUMNS
+export const MAX_PANEL_COUNT = 16 as const
 export const MIN_PANEL_COUNT = 1
 export const MAX_GAP_SIZE = 40 // px
 export const MAX_BORDER_WIDTH = 10 // px
