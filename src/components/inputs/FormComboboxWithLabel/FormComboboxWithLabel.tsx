@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import { TFormComboBoxField, TInputOption } from '@/types'
+import { TFormComboBoxField, TInputOption } from '@/appTypes'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
 import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormFieldDescription'
 import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'

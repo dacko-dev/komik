@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
 import { signupSchema, TSignupSchema } from '@/lib/schemas/signupSchema'
-import { TActionResponse } from '@/types'
+import { TActionResponse } from '@/appTypes'
 
 export async function signupAction(data: TSignupSchema) {
     const supabase = await createClient()

@@ -41,7 +41,7 @@ import {
     TPanelBorderWidth,
     TPanelGap,
     TReadingMode,
-} from '@/types'
+} from '@/appTypes'
 
 export interface Props<T> {
     activationConstraint?: PointerActivationConstraint

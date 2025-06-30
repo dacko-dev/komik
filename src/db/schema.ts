@@ -18,7 +18,7 @@ import {
 import { sql } from 'drizzle-orm'
 import { authenticatedRole, authUsers } from 'drizzle-orm/supabase'
 import { createSelectSchema } from 'drizzle-zod'
-import { TComicOptions } from '@/types'
+import { TComicOptions } from '@/appTypes'
 import { MAX_PANEL_COLUMNS, MAX_PANEL_COUNT } from '@/appConfig'
 
 // TODO: add npx drizzle-kit push to  GitHub Actions

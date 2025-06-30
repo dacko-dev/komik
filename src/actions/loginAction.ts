@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
 import { signupSchema } from '@/lib/schemas/signupSchema'
-import { TActionResponse } from '@/types'
+import { TActionResponse } from '@/appTypes'
 import { TLoginSchema } from '@/lib/schemas/loginSchema'
 
 export async function loginAction(data: TLoginSchema) {

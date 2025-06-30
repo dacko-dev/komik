@@ -1,4 +1,4 @@
-import { TColorSchema, TContentVisibility, TReadingMode } from '@/types'
+import { TColorSchema, TContentVisibility, TReadingMode } from '@/appTypes'
 
 export const FILE_MAX_SIZE = 500 * 1024 // 500kb
 export const FILE_ACCEPTED_TYPES = [

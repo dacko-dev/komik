@@ -7,7 +7,7 @@ import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormF
 import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
 import { seriesSelectSchema } from '@/db/schema'
-import { TFormField } from '@/types'
+import { TFormField } from '@/appTypes'
 import { Controller, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 import ScrollableCarousel from '@/components/ui/ScrollableCarousel/ScrollableCarousel'

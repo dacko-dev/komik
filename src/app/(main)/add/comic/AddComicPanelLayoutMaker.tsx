@@ -36,7 +36,7 @@ import CheckboxButton from '@/components/inputs/CheckboxButton/CheckboxButton'
 import RoundedIcon from '@/components/icons/RoundedIcon'
 import ColorInputButton from '@/components/inputs/ColorInputButton/ColorInputButton'
 import InputButton from '@/components/inputs/TextInputButton/TextInputButton'
-import { TReadingMode } from '@/types'
+import { TReadingMode } from '@/appTypes'
 import { readingModeSchema } from '@/db/schema'
 
 export default function AddComicPanelLayoutMaker() {

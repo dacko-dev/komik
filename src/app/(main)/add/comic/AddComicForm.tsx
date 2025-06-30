@@ -26,7 +26,7 @@ import FormTagInput from '@/components/inputs/FormTagInput/FormTagInput'
 import SelectComicSeries from '@/app/(main)/add/comic/SelectComicSeries'
 import FormComboboxWithLabel from '@/components/inputs/FormComboboxWithLabel/FormComboboxWithLabel'
 import SelectComicCollection from '@/app/(main)/add/comic/SelectComicCollection'
-import { TGenre, TLanguage, TSeries } from '@/types'
+import { TGenre, TLanguage, TSeries } from '@/appTypes'
 import AddComicPanelLayoutMaker from '@/app/(main)/add/comic/AddComicPanelLayoutMaker'
 import {
     APP_DEFAULTS,

@@ -1,7 +1,7 @@
 'use client'
 
 import DrawingBoardCanvas from '@/features/drawingBoard/components/DrawingBoardCanvas'
-import DrawingBoardTabMenu from '@/features/drawingBoard/components/DrawingBoardTabMenu'
+import DrawingBoardTabMenu from '@/features/drawingBoard/components/DrawingBoardTabMenu/DrawingBoardTabMenu'
 import DrawingBoardToolbar from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbar'
 
 // IMPORTANT: import with next/dynamic to avoid SSR issues - Module not found: Can't resolve 'canvas'

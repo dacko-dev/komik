@@ -3,7 +3,7 @@
 import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormFieldDescription'
 import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
-import { TFormTextAreaField } from '@/types'
+import { TFormTextAreaField } from '@/appTypes'
 import { Controller, useFormContext } from 'react-hook-form'
 
 export function FormTextareaWithLabel<S>({

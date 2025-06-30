@@ -4,66 +4,22 @@ import {
 } from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarButton'
 import React, { useState } from 'react'
 
-interface DrawingBoardToolbarOpacityProps
+interface DrawingBoardToolbarSizeProps
     extends Omit<DrawingBoardToolbarButtonProps, 'children'> {
     name: string
-
     inputProps?: Omit<
         React.InputHTMLAttributes<HTMLInputElement>,
         'type' | 'ref'
     >
 }
 
-// Custom Droplet component with fill capability
-const FilledDropletIcon = ({
-    size = 16,
-    fillPercentage = 100,
-}: {
-    size?: number
-    fillPercentage?: number
-}) => {
-    return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <defs>
-                <mask id="droplet-mask">
-                    <rect width="24" height="24" fill="black" />
-                    <path
-                        d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"
-                        fill="white"
-                    />
-                </mask>
-            </defs>
-
-            {/* Droplet outline */}
-            <path
-                d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-
-            {/* Fill based on percentage */}
-            <rect
-                x="0"
-                y={24 - (fillPercentage / 100) * 24}
-                width="24"
-                height={(fillPercentage / 100) * 24}
-                fill="currentColor"
-                stroke="none"
-                mask="url(#droplet-mask)"
-                opacity="1"
-            />
-        </svg>
-    )
-}
-
-export default function DrawingBoardToolbarOpacity({
-    name,
+export default function DrawingBoardToolbarSize({
     inputProps = {},
+    name,
     ...buttonProps
-}: DrawingBoardToolbarOpacityProps) {
+}: DrawingBoardToolbarSizeProps & {
+    name: string
+}) {
     const { onChange: onInputChange, ...restInputProps } = inputProps
 
     const [internalValue, setInternalValue] = useState<number>(
@@ -90,13 +46,12 @@ export default function DrawingBoardToolbarOpacity({
                         anchorName: `--anchor-${name}`,
                     } as React.CSSProperties
                 }
-                className={`p-0 btn btn-sm`}
+                className={`p-0 btn btn-sm `}
                 {...buttonProps}
-                tooltip={`Opacity (${internalValue}%)`}
+                tooltip={`Size (${internalValue}px)`} // Tooltip showing the current size
             >
-                <FilledDropletIcon size={16} fillPercentage={internalValue} />
+                <div className="rounded-full bg-black w-3 h-3 border border-white/20" />
             </DrawingBoardToolbarButton>
-
             <div
                 className="dropdown dropdown-center border-0 menu rounded-box bg-base-300 shadow-sm mt-[2px]"
                 popover="auto"
@@ -111,16 +66,16 @@ export default function DrawingBoardToolbarOpacity({
                     <input
                         step={1}
                         type="range"
-                        min="0"
-                        max="100"
-                        defaultValue="100"
+                        min="1"
+                        max="25"
+                        defaultValue="25"
                         className="vertical-lr direction-rtl"
                         onChange={handleChange}
                         {...restInputProps}
                     />
                     <div className="flex justify-center items-center mt-auto">
                         <span className="text-xs text-center">
-                            {internalValue}%
+                            {internalValue}px
                         </span>
                     </div>
                 </div>

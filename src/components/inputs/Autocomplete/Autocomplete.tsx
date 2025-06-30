@@ -1,4 +1,4 @@
-import { TAutocompleteInputFieldProps } from '@/types'
+import { TAutocompleteInputFieldProps } from '@/appTypes'
 import React from 'react'
 
 export default function Autocomplete({

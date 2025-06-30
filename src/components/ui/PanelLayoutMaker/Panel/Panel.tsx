@@ -8,7 +8,7 @@ import clsx from 'clsx'
 import Remove from '@/components/ui/PanelLayoutMaker/Panel/Remove'
 import Handle from '@/components/ui/PanelLayoutMaker/Panel/Handle'
 import { PANEL_ROUNDED_VALUE } from '@/appConfig'
-import { TPanelBorderWidth } from '@/types'
+import { TPanelBorderWidth } from '@/appTypes'
 
 export interface Props {
     dragOverlay?: boolean

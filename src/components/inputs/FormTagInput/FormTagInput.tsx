@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import { TFormTagInputField } from '@/types'
+import { TFormTagInputField } from '@/appTypes'
 import Autocomplete from '@/components/inputs/Autocomplete/Autocomplete'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
 import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormFieldDescription'

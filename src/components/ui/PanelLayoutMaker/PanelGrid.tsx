@@ -1,4 +1,4 @@
-import { TColorSchema, TPanelGap, TReadingMode } from '@/types'
+import { TColorSchema, TPanelGap, TReadingMode } from '@/appTypes'
 import clsx from 'clsx'
 
 export interface Props {

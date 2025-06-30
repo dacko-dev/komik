@@ -14,7 +14,6 @@ import {
     PaintbrushIcon,
     PaintBucket,
     PencilIcon,
-    PipetteIcon,
     SquareIcon,
     StarIcon,
     TypeIcon,
@@ -22,6 +21,7 @@ import {
 import { useState } from 'react'
 import { DrawingBoardToolbarButton } from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarButton'
 import DrawingBoardToolbarOpacity from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarOpacity'
+import DrawingBoardToolbarSize from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarSize'
 
 const selectionToolOptions = [
     {
@@ -122,9 +122,13 @@ export default function DrawingBoardToolbar() {
         setSelectedTool(tool)
         console.log('Selected tool:', tool)
     }
+
     return (
-        <div className="sticky top-0 left-0 z-10 flex justify-center py-2 w-full gap-4 ">
-            <ul className="flex gap-2 p-2 rounded-box bg-base-300 ">
+        <div className="sticky -mb-6 top-0  z-10 flex justify-center py-2 w-full gap-4 pointer-events-none">
+            <ul className="flex gap-2 p-2 rounded-box bg-base-300 pointer-events-auto">
+                <li>
+                    <DrawingBoardToolbarSize name="size-tool" tooltip="Size" />
+                </li>
                 <li>
                     <DrawingBoardToolbarColorPicker tooltip="Color Picker" />
                 </li>
@@ -142,7 +146,7 @@ export default function DrawingBoardToolbar() {
                 </li>
             </ul>
 
-            <ul className="flex gap-2 p-2 rounded-box bg-base-300 ">
+            <ul className="flex gap-2 p-2 rounded-box bg-base-300 pointer-events-auto">
                 <li>
                     <DrawingBoardToolbarSelect
                         name="selection-tool"
@@ -168,32 +172,7 @@ export default function DrawingBoardToolbar() {
                         <EraserIcon size={16} />
                     </DrawingBoardToolbarButton>
                 </li>
-                {/* <li>
-                    <DrawingBoardToolbarButton
-                        tooltip="Eyedropper"
-                        isActive={selectedTool === DrawAction.EYEDROPPER}
-                        onClick={() => {
-                            handleToolChange(DrawAction.EYEDROPPER)
-                        }}
-                    >
-                        <PipetteIcon size={16} />
-                    </DrawingBoardToolbarButton>
-                </li>
-                <li>
-                    <DrawingBoardToolbarColorPicker tooltip="Color Picker" />
-                </li>
-                <li>
-                    <DrawingBoardToolbarOpacity
-                        name="opacity-tool"
-                        tooltip="Opacity"
-                        inputProps={{
-                            onChange: (e) => {
-                                const value = e.target.value
-                                console.log('Opacity changed:', value)
-                            },
-                        }}
-                    />
-                </li> */}
+
                 <li>
                     <DrawingBoardToolbarSelect
                         name="drawing-tool"

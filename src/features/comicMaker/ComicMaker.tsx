@@ -1,6 +1,6 @@
 'use client'
-import ComicMakerNavbar from '@/features/comicMaker/ComicMakerNavbar'
-import ComicMakerSidebar from '@/features/comicMaker/ComicMakerSidebar'
+
+import ComicMakerLayout from '@/features/comicMaker/ComicMakerLayout'
 import dynamic from 'next/dynamic'
 import React from 'react'
 
@@ -13,12 +13,8 @@ const DrawingBoard = dynamic(
 
 export default function ComicMaker() {
     return (
-        <div className="h-screen grid grid-cols-[auto_1fr]">
-            <ComicMakerSidebar />
-            <main className="flex flex-col">
-                <ComicMakerNavbar />
-                <DrawingBoard />
-            </main>
-        </div>
+        <ComicMakerLayout>
+            <DrawingBoard />
+        </ComicMakerLayout>
     )
 }

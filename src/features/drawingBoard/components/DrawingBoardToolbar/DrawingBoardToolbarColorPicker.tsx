@@ -33,7 +33,7 @@ export default function DrawingBoardToolbarColorPicker({
         >
             <input
                 type="color"
-                className=" cursor-pointer w-4 h-4 p-0 rounded-sm border-1 border-base-300"
+                className=" cursor-pointer w-4 h-4 p-0 rounded-sm border border-base-300"
                 ref={ref}
                 {...inputProps}
             />

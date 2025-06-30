@@ -105,7 +105,7 @@ export function DrawingBoardToolbarSelect({
 
             <ul
                 ref={dropdownRef}
-                className="dropdown dropdown-end border-0 p-1 menu rounded-box bg-base-300 shadow-none mt-[2px] me-[10px]"
+                className="dropdown dropdown-end border-0 p-1 menu rounded-box bg-base-300 shadow-sm mt-[2px] me-[10px]"
                 popover="auto"
                 id={`popover-${name}`}
                 style={

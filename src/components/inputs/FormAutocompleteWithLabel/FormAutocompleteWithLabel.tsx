@@ -3,7 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
 import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormFieldDescription'
 import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'
-import { TFormAutocompleteInputField } from '@/types'
+import { TFormAutocompleteInputField } from '@/appTypes'
 import Autocomplete from '@/components/inputs/Autocomplete/Autocomplete'
 
 // TODO - add suggestion box in a dropdown if browser does not support datalist

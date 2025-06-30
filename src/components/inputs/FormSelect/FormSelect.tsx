@@ -2,7 +2,7 @@
 
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { TFormSelectField } from '@/types'
+import { TFormSelectField } from '@/appTypes'
 import FormFieldDescription from '@/components/inputs/FormFieldDescription/FormFieldDescription'
 import FormFieldError from '@/components/inputs/FormFieldError/FormFieldError'
 import FormFieldLabel from '@/components/inputs/FormFieldLabel/FormFieldLabel'
