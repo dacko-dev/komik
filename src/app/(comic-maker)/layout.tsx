@@ -1,3 +1,4 @@
+import ComicMakerLayout from '@/features/comicMaker/ComicMakerLayout'
 import React from 'react'
 
 export default function AuthLayout({
@@ -5,5 +6,5 @@ export default function AuthLayout({
 }: {
     children: React.ReactNode
 }) {
-    return <div className="h-screen">{children}</div>
+    return <ComicMakerLayout>{children}</ComicMakerLayout>
 }

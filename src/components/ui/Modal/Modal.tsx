@@ -1,7 +1,14 @@
 'use client'
 
-import React, { MouseEvent, useEffect, useRef, useState } from 'react'
+import React, {
+    MouseEvent,
+    useEffect,
+    useRef,
+    useState,
+    useTransition,
+} from 'react'
 import ReactDOM from 'react-dom'
+import toast from 'react-hot-toast'
 
 type TriggerWithOnClick = React.ReactElement<{
     onClick: (e: MouseEvent) => void
@@ -12,7 +19,7 @@ type ModalProps = {
     modalTitle: string
     modalDescription?: string
     trigger: TriggerWithOnClick
-    onConfirm: () => void
+    onConfirmAction: () => Promise<{ error: boolean; message?: string }>
     onCancel?: () => void
     submitLabel?: string
     cancelLabel?: string
@@ -27,28 +34,39 @@ export default function Modal({
     trigger,
     submitLabel,
     cancelLabel,
-    onConfirm,
+    onConfirmAction,
     onCancel,
     usePortal = false,
     children,
 }: ModalProps) {
     const [mounted, setMounted] = useState(false)
-
+    const [isPending, startTransition] = useTransition()
     useEffect(() => {
         setMounted(true)
     }, [])
     const dialogRef = useRef<HTMLDialogElement>(null)
+    const previousActiveElement = useRef<HTMLElement | null>(null)
 
     if (usePortal && !mounted) return null
 
+    function performOnConfirmAction() {
+        startTransition(async () => {
+            const data = await onConfirmAction()
+            if (data.error) {
+                toast.error(data.message ?? 'Error')
+            }
+        })
+    }
     const closeModal = () => {
         dialogRef.current?.close()
+        previousActiveElement.current?.focus()
     }
 
     const enhancedTrigger = React.cloneElement(trigger, {
         onClick: (e: MouseEvent) => {
+            previousActiveElement.current =
+                document.activeElement as HTMLElement
             dialogRef.current?.showModal()
-
             // Call the original onClick from the passed trigger
             if (trigger.props.onClick) {
                 trigger.props.onClick(e)
@@ -88,9 +106,20 @@ export default function Modal({
                     <button
                         type="button"
                         className="btn btn-primary"
-                        onClick={onConfirm}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            performOnConfirmAction()
+                        }}
+                        disabled={isPending}
                     >
-                        {submitLabel || 'Confirm'}
+                        {isPending ? (
+                            <span className="loading loading-spinner" />
+                        ) : submitLabel ? (
+                            submitLabel
+                        ) : (
+                            'Confirm'
+                        )}
                     </button>
                 </div>
             </div>
@@ -100,7 +129,7 @@ export default function Modal({
                     onClick={closeModal}
                     aria-label="Close Modal"
                 >
-                    close
+                    Close
                 </button>
             </div>
         </dialog>
