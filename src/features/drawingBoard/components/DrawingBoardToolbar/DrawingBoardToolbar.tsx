@@ -1,6 +1,6 @@
 import DrawingBoardToolbarColorPicker from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarColorPicker'
 import { DrawingBoardToolbarSelect } from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarSelect'
-import { DrawAction } from '@/contexts/drawingBoardContext'
+
 import {
     CircleIcon,
     EraserIcon,
@@ -22,18 +22,19 @@ import { useState } from 'react'
 import { DrawingBoardToolbarButton } from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarButton'
 import DrawingBoardToolbarOpacity from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarOpacity'
 import DrawingBoardToolbarSize from '@/features/drawingBoard/components/DrawingBoardToolbar/DrawingBoardToolbarSize'
+import { Tool } from '@/features/drawingBoard/store/useToolbar'
 
 const selectionToolOptions = [
     {
         label: 'Select',
         icon: <MousePointer2Icon size={16} />,
-        value: DrawAction.SELECT,
+        value: Tool.SELECT,
         tooltip: 'Select',
     },
     {
         label: 'Move',
         icon: <MoveIcon size={16} />,
-        value: DrawAction.MOVE,
+        value: Tool.MOVE,
         tooltip: 'Move',
     },
 ]
@@ -42,37 +43,37 @@ const shapeToolOptions = [
     {
         label: 'Circle',
         icon: <CircleIcon size={16} />,
-        value: DrawAction.CIRCLE,
+        value: Tool.CIRCLE,
         tooltip: 'Circle',
     },
     {
         label: 'Rectangle',
         icon: <SquareIcon size={16} />,
-        value: DrawAction.RECTANGLE,
+        value: Tool.RECTANGLE,
         tooltip: 'Rectangle',
     },
     {
         label: 'Hexagon',
         icon: <HexagonIcon size={16} />,
-        value: DrawAction.HEXAGON,
+        value: Tool.HEXAGON,
         tooltip: 'Hexagon',
     },
     {
         label: 'Line',
         icon: <MinusIcon size={16} />,
-        value: DrawAction.LINE,
+        value: Tool.LINE,
         tooltip: 'Line',
     },
     {
         label: 'Heart',
         icon: <HeartIcon size={16} />,
-        value: DrawAction.HEART,
+        value: Tool.HEART,
         tooltip: 'Heart',
     },
     {
         label: 'Star',
         icon: <StarIcon size={16} />,
-        value: DrawAction.STAR,
+        value: Tool.STAR,
         tooltip: 'Star',
     },
 ]
@@ -81,19 +82,19 @@ const drawingToolOptions = [
     {
         label: 'Pencil',
         icon: <PencilIcon size={16} />,
-        value: DrawAction.PENCIL,
+        value: Tool.PENCIL,
         tooltip: 'Pencil',
     },
     {
         label: 'Paintbrush',
         icon: <PaintbrushIcon size={16} />,
-        value: DrawAction.PAINTBRUSH,
+        value: Tool.PAINTBRUSH,
         tooltip: 'Paintbrush',
     },
     {
         label: 'Paint Bucket',
         icon: <PaintBucket size={16} />,
-        value: DrawAction.PAINT_BUCKET,
+        value: Tool.PAINT_BUCKET,
         tooltip: 'Bucket',
     },
 ]
@@ -102,23 +103,21 @@ const chatToolOptions = [
     {
         label: 'Square Chat Bubble',
         icon: <MessageSquareIcon size={16} />,
-        value: DrawAction.SQUARE_CHAT_BUBBLE,
+        value: Tool.SQUARE_CHAT_BUBBLE,
         tooltip: 'Square Bubble',
     },
     {
         label: 'Round Chat Bubble',
         icon: <MessageCircleIcon size={16} />,
-        value: DrawAction.CIRCLE_CHAT_BUBBLE,
+        value: Tool.CIRCLE_CHAT_BUBBLE,
         tooltip: 'Circle Bubble',
     },
 ]
 
 export default function DrawingBoardToolbar() {
-    const [selectedTool, setSelectedTool] = useState<DrawAction>(
-        DrawAction.SELECT
-    )
+    const [selectedTool, setSelectedTool] = useState<Tool>(Tool.SELECT)
 
-    const handleToolChange = (tool: DrawAction) => {
+    const handleToolChange = (tool: Tool) => {
         setSelectedTool(tool)
         console.log('Selected tool:', tool)
     }
@@ -164,9 +163,9 @@ export default function DrawingBoardToolbar() {
                 <li>
                     <DrawingBoardToolbarButton
                         tooltip="Eraser"
-                        isActive={selectedTool === DrawAction.ERASER}
+                        isActive={selectedTool === Tool.ERASER}
                         onClick={() => {
-                            handleToolChange(DrawAction.ERASER)
+                            handleToolChange(Tool.ERASER)
                         }}
                     >
                         <EraserIcon size={16} />
@@ -202,9 +201,9 @@ export default function DrawingBoardToolbar() {
                 <li>
                     <DrawingBoardToolbarButton
                         tooltip="Text"
-                        isActive={selectedTool === DrawAction.TEXT}
+                        isActive={selectedTool === Tool.TEXT}
                         onClick={() => {
-                            handleToolChange(DrawAction.TEXT)
+                            handleToolChange(Tool.TEXT)
                         }}
                     >
                         <TypeIcon size={16} />

@@ -1,4 +1,4 @@
-import LayoutEditor from '@/features/layoutEditor/layoutEditor'
+import LayoutEditor from '@/features/layoutEditor/LayoutEditor'
 
 export default async function ComicMakerPage({
     params,
