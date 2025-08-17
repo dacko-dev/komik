@@ -1,14 +1,8 @@
-import {
-    PointerSensor,
-    useDraggable,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core'
 import React, { useRef } from 'react'
-import { CSS } from '@dnd-kit/utilities'
 import { TLayoutEditorPanel } from '@/features/layoutEditor/schemas/layoutEditorPanelSchema'
 import { usePanels } from '@/features/layoutEditor/store/usePanels'
 import clsx from 'clsx'
+import { Line, RegularPolygon } from 'react-konva'
 
 export default function LayoutBoardPanel({
     panel,
@@ -26,27 +20,37 @@ export default function LayoutBoardPanel({
     } = usePanels()
 
     return (
-        <button
-            type="button"
-            className={clsx('', isDragging ? 'z-100' : 'z-10')}
-            ref={ref}
-            style={{
-                borderWidth: panel.borderWidth,
-                borderRadius: panel.borderRadius,
-                borderColor: panel.borderColor,
-                width: panel.width,
-                height: panel.height,
-                outline:
-                    activePanelId === panel.id
-                        ? '2px solid #3b82f6' // blue-500
-                        : 'none',
-            }}
-            onClick={() => {
-                // https://github.com/clauderic/dnd-kit/issues/800
-                setActivePanel(panel.id)
-            }}
+        // https://konvajs.org/api/Konva.Line.html
+        <Line
+            draggable={true}
+            points={[73, 192, 73, 160, 340, 23, 500, 109, 499, 139, 342, 93]}
+            // fill={panel.backgroundColor}
+            stroke={panel.borderColor}
+            strokeWidth={panel.borderWidth}
+            closed
         >
-            Panel
-        </button>
+            <button
+                type="button"
+                className={clsx('')}
+                ref={ref}
+                style={{
+                    borderWidth: panel.borderWidth,
+                    borderRadius: panel.borderRadius,
+                    borderColor: panel.borderColor,
+                    width: panel.width,
+                    height: panel.height,
+                    outline:
+                        activePanelId === panel.id
+                            ? '2px solid #3b82f6' // blue-500
+                            : 'none',
+                }}
+                onClick={() => {
+                    // https://github.com/clauderic/dnd-kit/issues/800
+                    setActivePanel(panel.id)
+                }}
+            >
+                Panel
+            </button>
+        </Line>
     )
 }

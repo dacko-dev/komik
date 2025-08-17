@@ -2,14 +2,8 @@
 
 import LayoutBoardPanel from '@/features/layoutEditor/LayoutBoardPanel'
 import { usePanels } from '@/features/layoutEditor/store/usePanels'
-import {
-    DndContext,
-    PointerSensor,
-    useDroppable,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core'
 import { useSearchParams } from 'next/navigation'
+import { Layer, Stage } from 'react-konva'
 
 export default function LayoutBoard() {
     const searchParams = useSearchParams()
@@ -25,29 +19,15 @@ export default function LayoutBoard() {
         clearPanels,
     } = usePanels()
 
-    const { isOver, setNodeRef } = useDroppable({
-        id: 'layoutBoard',
-    })
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                tolerance: 10,
-                delay: 100, //  Delay to avoid  conflicts onClick with drag events
-            },
-        })
-    )
-
     return (
-        <DndContext sensors={sensors}>
-            <div
-                ref={setNodeRef}
-                className="border border-base-300 w-[800px] h-[600px]"
-            >
-                {panels.map((panel) => (
-                    <LayoutBoardPanel key={panel.id} panel={panel} />
-                ))}
-            </div>
-        </DndContext>
+        <Stage>
+            <Layer>
+                <div className="border border-base-300 w-[800px] h-[600px]">
+                    {panels.map((panel) => (
+                        <LayoutBoardPanel key={panel.id} panel={panel} />
+                    ))}
+                </div>
+            </Layer>
+        </Stage>
     )
 }

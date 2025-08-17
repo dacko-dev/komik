@@ -4,7 +4,7 @@
             "file": "./.vscode/daisyui.md"
         }
     ],
-
+    "peacock.remoteColor": "#294497",
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3456bf",
         "activityBar.background": "#3456bf",
@@ -23,6 +23,5 @@
         "titleBar.activeForeground": "#e7e7e7",
         "titleBar.inactiveBackground": "#29449799",
         "titleBar.inactiveForeground": "#e7e7e799"
-    },
-    "peacock.remoteColor": "#294497"
+    }
 }
