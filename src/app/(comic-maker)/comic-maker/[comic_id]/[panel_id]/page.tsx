@@ -1,11 +1,8 @@
-import dynamic from 'next/dynamic'
+'use client'
+
+import DrawingBoard from '@/features/drawingBoard/components/DrawingBoard'
 import React from 'react'
-const DrawingBoard = dynamic(
-    () => import('@/features/drawingBoard/components/DrawingBoard'),
-    {
-        ssr: false,
-    }
-)
+
 export default function page() {
     return <DrawingBoard />
 }
